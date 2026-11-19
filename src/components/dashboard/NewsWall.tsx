@@ -6,7 +6,7 @@ type News = { id: number; title: string; body: string; created_at: string };
 
 export default function NewsWall({ news }: { news: News[] }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
+    <section className="rounded-xl border border-slate-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-semibold">
           <Megaphone className="h-5 w-5 text-blue-600" /> Noticias y anuncios

@@ -1,5 +1,3 @@
-import mock from "./mock-employees.json";
-
 export type Employee = {
   id: string;
   full_name: string | null;
@@ -9,18 +7,7 @@ export type Employee = {
   phone: string | null;
   birthday: string | null;
   avatar_url: string | null;
-  isMock?: boolean;
 };
-
-/**
- * Muestra empleados de ejemplo junto a los reales.
- * Ponlo en `false` cuando tu equipo ya esté dado de alta.
- */
-export const SHOW_MOCK_EMPLOYEES = true;
-
-export const mockEmployees: Employee[] = SHOW_MOCK_EMPLOYEES
-  ? mock.map((e) => ({ ...e, isMock: true }))
-  : [];
 
 /** Días que faltan para el próximo cumpleaños (0 = hoy). */
 export function daysUntilBirthday(birthday: string, today = new Date()) {
@@ -30,3 +17,7 @@ export function daysUntilBirthday(birthday: string, today = new Date()) {
   if (next < base) next = new Date(today.getFullYear() + 1, m - 1, d);
   return Math.round((next.getTime() - base.getTime()) / 86_400_000);
 }
+
+/** Normaliza un nombre para emparejar el perfil de Supabase con el integrante de Notion. */
+export const normalizeName = (s: string | null | undefined) =>
+  (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();

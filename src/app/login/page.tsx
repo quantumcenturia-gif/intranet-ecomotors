@@ -15,9 +15,9 @@ export default function LoginPage() {
           <div className="rounded-xl bg-blue-100 p-3 text-blue-600">
             <Building2 className="h-7 w-7" />
           </div>
-          <h1 className="text-xl font-semibold">Intranet</h1>
+          <h1 className="text-xl font-semibold">Intranet Eco Motors</h1>
           <p className="text-sm text-slate-500">
-            {mode === "login" ? "Inicia sesión con tu cuenta" : "Crea tu cuenta de empleado"}
+            {mode === "login" ? "Inicia sesión con tu cuenta" : "Crea tu cuenta de integrante"}
           </p>
         </div>
 

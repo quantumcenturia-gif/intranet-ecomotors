@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react";
-import { quickLinks } from "@/data/quick-links";
+import { quickLinks } from "@/data/eco-motors";
 
 export default function QuickLinks() {
   return (

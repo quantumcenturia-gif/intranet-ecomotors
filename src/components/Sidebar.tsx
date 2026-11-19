@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Building2, FileText, Home, LogOut, Megaphone, Menu, User, Users, X } from "lucide-react";
+import { Building2, CalendarDays, FileText, Home, LogOut, Megaphone, Menu, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/noticias", label: "Noticias", icon: Megaphone },
   { href: "/directorio", label: "Directorio", icon: Users },
+  { href: "/calendario", label: "Calendario", icon: CalendarDays },
   { href: "/documentos", label: "Documentos", icon: FileText },
   { href: "/perfil", label: "Mi perfil", icon: User },
 ];
@@ -21,7 +22,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
     <>
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
         <span className="flex items-center gap-2 font-semibold">
-          <Building2 className="h-5 w-5 text-blue-600" /> Intranet
+          <Building2 className="h-5 w-5 text-blue-600" /> Eco Motors
         </span>
         <button onClick={() => setOpen(!open)} aria-label="Menú">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -32,7 +33,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
         className={`${open ? "block" : "hidden"} border-r border-slate-200 bg-white md:flex md:min-h-screen md:w-64 md:flex-col`}
       >
         <div className="hidden items-center gap-2 px-6 py-5 text-lg font-semibold md:flex">
-          <Building2 className="h-6 w-6 text-blue-600" /> Intranet
+          <Building2 className="h-6 w-6 text-blue-600" /> Eco Motors
         </div>
         <nav className="flex-1 space-y-1 px-3 py-2">
           {links.map(({ href, label, icon: Icon }) => {
@@ -53,7 +54,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
         </nav>
         <div className="border-t border-slate-200 p-4">
           <p className="truncate text-sm font-medium">{name}</p>
-          <p className="mb-3 text-xs capitalize text-slate-500">{role}</p>
+          <p className="mb-3 text-xs text-slate-500">{role === "admin" ? "Coordinación" : "Integrante"}</p>
           <form action="/auth/signout" method="post">
             <button className="flex items-center gap-2 text-sm text-slate-600 hover:text-red-600">
               <LogOut className="h-4 w-4" /> Cerrar sesión

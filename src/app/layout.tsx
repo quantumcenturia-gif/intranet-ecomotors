@@ -6,8 +6,8 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Intranet",
-  description: "Intranet corporativa",
+  title: "Intranet · Eco Motors",
+  description: "Intranet del Semillero Eco Motors · FIM UNI",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
