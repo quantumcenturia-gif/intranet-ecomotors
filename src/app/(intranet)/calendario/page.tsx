@@ -28,7 +28,7 @@ export default async function CalendarioPage() {
       <div className="space-y-6">
         {[...byDay].map(([day, list]) => (
           <section key={day}>
-            <h2 className="mb-2 text-sm font-semibold capitalize text-slate-500">{day}</h2>
+            <h2 className="mb-2 text-sm font-semibold text-slate-500 first-letter:uppercase">{day}</h2>
             <div className="space-y-2">
               {list.map((e) => (
                 <a

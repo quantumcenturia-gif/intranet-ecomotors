@@ -33,7 +33,7 @@ export default async function HomePage() {
         <Stat href="/documentos" icon={FileText} value={docs.count ?? 0} label="Documentos compartidos" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 [&>*]:min-w-0">
         <div className="space-y-6 lg:col-span-2">
           <NewsWall news={news.data ?? []} />
           <UpcomingEvents events={events.data} error={events.error} />
