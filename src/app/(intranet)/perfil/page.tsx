@@ -4,10 +4,12 @@ import { getCurrentUser } from "@/lib/supabase/server";
 import { updateProfile } from "./actions";
 
 const fields = [
-  { name: "full_name", label: "Nombre completo" },
-  { name: "position", label: "Cargo" },
-  { name: "department", label: "Departamento" },
-  { name: "phone", label: "Teléfono" },
+  { name: "full_name", label: "Nombre completo", type: "text" },
+  { name: "position", label: "Cargo", type: "text" },
+  { name: "department", label: "Departamento", type: "text" },
+  { name: "phone", label: "Teléfono", type: "tel" },
+  { name: "birthday", label: "Fecha de cumpleaños", type: "date" },
+  { name: "avatar_url", label: "URL de tu foto", type: "url" },
 ] as const;
 
 export default async function PerfilPage() {
@@ -22,12 +24,13 @@ export default async function PerfilPage() {
             <span className="mb-1 block text-sm font-medium text-slate-700">{f.label}</span>
             <input
               name={f.name}
+              type={f.type}
               defaultValue={profile?.[f.name] ?? ""}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           </label>
         ))}
-        <button className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+        <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
           <Save className="h-4 w-4" /> Guardar
         </button>
       </form>

@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 export default function PageHeader({ icon: Icon, title, subtitle }: { icon: LucideIcon; title: string; subtitle?: string }) {
   return (
     <div className="mb-6 flex items-center gap-3">
-      <div className="rounded-xl bg-indigo-100 p-2.5 text-indigo-600">
+      <div className="rounded-xl bg-blue-100 p-2.5 text-blue-600">
         <Icon className="h-6 w-6" />
       </div>
       <div>

@@ -21,7 +21,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
     <>
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden">
         <span className="flex items-center gap-2 font-semibold">
-          <Building2 className="h-5 w-5 text-indigo-600" /> Intranet
+          <Building2 className="h-5 w-5 text-blue-600" /> Intranet
         </span>
         <button onClick={() => setOpen(!open)} aria-label="Menú">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -32,7 +32,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
         className={`${open ? "block" : "hidden"} border-r border-slate-200 bg-white md:flex md:min-h-screen md:w-64 md:flex-col`}
       >
         <div className="hidden items-center gap-2 px-6 py-5 text-lg font-semibold md:flex">
-          <Building2 className="h-6 w-6 text-indigo-600" /> Intranet
+          <Building2 className="h-6 w-6 text-blue-600" /> Intranet
         </div>
         <nav className="flex-1 space-y-1 px-3 py-2">
           {links.map(({ href, label, icon: Icon }) => {
@@ -43,7 +43,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
                 href={href}
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  active ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"
+                  active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 <Icon className="h-5 w-5" /> {label}

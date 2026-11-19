@@ -17,8 +17,8 @@ export default async function DocumentosPage() {
       <PageHeader icon={FileText} title="Documentos" subtitle="Archivos compartidos de la empresa" />
 
       <form action={uploadDocument} className="mb-6 flex flex-col gap-3 rounded-xl border border-dashed border-slate-300 bg-white p-5 sm:flex-row sm:items-center">
-        <input name="file" type="file" required className="flex-1 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-indigo-700" />
-        <button className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+        <input name="file" type="file" required className="flex-1 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-blue-700" />
+        <button className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
           <Upload className="h-4 w-4" /> Subir
         </button>
       </form>
@@ -30,7 +30,7 @@ export default async function DocumentosPage() {
               const uploader = Array.isArray(d.uploader) ? d.uploader[0] : d.uploader;
               return (
                 <li key={d.id} className="flex items-center gap-4 p-4">
-                  <FileText className="h-8 w-8 shrink-0 text-indigo-500" />
+                  <FileText className="h-8 w-8 shrink-0 text-blue-500" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{d.name}</p>
                     <p className="text-xs text-slate-500">
@@ -40,7 +40,7 @@ export default async function DocumentosPage() {
                   <form action={downloadDocument}>
                     <input type="hidden" name="path" value={d.path} />
                     <input type="hidden" name="name" value={d.name} />
-                    <button aria-label="Descargar" className="text-slate-500 hover:text-indigo-600">
+                    <button aria-label="Descargar" className="text-slate-500 hover:text-blue-600">
                       <Download className="h-5 w-5" />
                     </button>
                   </form>

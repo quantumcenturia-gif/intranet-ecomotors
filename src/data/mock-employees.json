@@ -1,0 +1,10 @@
+[
+  { "id": "mock-1", "full_name": "Laura Martínez", "position": "Directora General", "department": "Dirección", "email": "laura.martinez@ejemplo.com", "phone": "+34 600 111 001", "birthday": "1982-11-24", "avatar_url": "https://i.pravatar.cc/200?img=47" },
+  { "id": "mock-2", "full_name": "Carlos Gómez", "position": "Jefe de Ventas", "department": "Comercial", "email": "carlos.gomez@ejemplo.com", "phone": "+34 600 111 002", "birthday": "1988-12-03", "avatar_url": "https://i.pravatar.cc/200?img=12" },
+  { "id": "mock-3", "full_name": "Ana Rodríguez", "position": "Responsable de RR. HH.", "department": "Recursos Humanos", "email": "ana.rodriguez@ejemplo.com", "phone": "+34 600 111 003", "birthday": "1990-11-29", "avatar_url": "https://i.pravatar.cc/200?img=45" },
+  { "id": "mock-4", "full_name": "Javier López", "position": "Técnico de Taller", "department": "Taller", "email": "javier.lopez@ejemplo.com", "phone": "+34 600 111 004", "birthday": "1993-12-15", "avatar_url": "https://i.pravatar.cc/200?img=33" },
+  { "id": "mock-5", "full_name": "Marta Sánchez", "position": "Contable", "department": "Finanzas", "email": "marta.sanchez@ejemplo.com", "phone": "+34 600 111 005", "birthday": "1985-01-08", "avatar_url": "https://i.pravatar.cc/200?img=44" },
+  { "id": "mock-6", "full_name": "Diego Fernández", "position": "Desarrollador Web", "department": "Tecnología", "email": "diego.fernandez@ejemplo.com", "phone": "+34 600 111 006", "birthday": "1995-02-20", "avatar_url": "https://i.pravatar.cc/200?img=15" },
+  { "id": "mock-7", "full_name": "Lucía Torres", "position": "Atención al Cliente", "department": "Comercial", "email": "lucia.torres@ejemplo.com", "phone": "+34 600 111 007", "birthday": "1997-12-01", "avatar_url": "https://i.pravatar.cc/200?img=32" },
+  { "id": "mock-8", "full_name": "Pablo Ruiz", "position": "Jefe de Taller", "department": "Taller", "email": "pablo.ruiz@ejemplo.com", "phone": "+34 600 111 008", "birthday": "1980-03-11", "avatar_url": "https://i.pravatar.cc/200?img=53" }
+]

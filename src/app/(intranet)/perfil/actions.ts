@@ -16,6 +16,8 @@ export async function updateProfile(formData: FormData) {
       department: String(formData.get("department")),
       position: String(formData.get("position")),
       phone: String(formData.get("phone")),
+      birthday: String(formData.get("birthday")) || null,
+      avatar_url: String(formData.get("avatar_url")) || null,
     })
     .eq("id", user.id);
   revalidatePath("/", "layout");

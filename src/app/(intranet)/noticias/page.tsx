@@ -20,7 +20,7 @@ export default async function NoticiasPage() {
         <form action={createAnnouncement} className="mb-6 space-y-3 rounded-xl border border-slate-200 bg-white p-5">
           <input name="title" required placeholder="Título" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
           <textarea name="body" required rows={3} placeholder="Escribe el comunicado…" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
-          <button className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+          <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
             <Send className="h-4 w-4" /> Publicar
           </button>
         </form>

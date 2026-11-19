@@ -14,6 +14,10 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 
+-- Columnas añadidas en la fase 2/4 (seguro ejecutarlo varias veces)
+alter table public.profiles add column if not exists birthday date;
+alter table public.profiles add column if not exists avatar_url text;
+
 -- Crear el perfil automáticamente al registrarse
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$

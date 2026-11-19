@@ -9,10 +9,10 @@ export default function LoginPage() {
   const [state, action, pending] = useActionState(mode === "login" ? login : signup, undefined);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-600 to-sky-500 p-4">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-700 to-blue-500 p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <div className="rounded-xl bg-indigo-100 p-3 text-indigo-600">
+          <div className="rounded-xl bg-blue-100 p-3 text-blue-600">
             <Building2 className="h-7 w-7" />
           </div>
           <h1 className="text-xl font-semibold">Intranet</h1>
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
           <button
             disabled={pending}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 font-medium text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {pending && <Loader2 className="h-4 w-4 animate-spin" />}
             {mode === "login" ? "Entrar" : "Registrarse"}
@@ -42,7 +42,7 @@ export default function LoginPage() {
 
         <button
           onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          className="mt-4 w-full text-center text-sm text-indigo-600 hover:underline"
+          className="mt-4 w-full text-center text-sm text-blue-600 hover:underline"
         >
           {mode === "login" ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
         </button>
@@ -60,7 +60,7 @@ function Field(props: { label: string; name: string; type: string; minLength?: n
         name={props.name}
         type={props.type}
         minLength={props.minLength}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+        className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
       />
     </label>
   );
