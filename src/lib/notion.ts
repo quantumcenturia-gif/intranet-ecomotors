@@ -1,5 +1,4 @@
 import "server-only";
-import { connection } from "next/server";
 
 /**
  * Lectura de las bases de Notion de Eco Motors (solo lectura, desde el servidor).
@@ -17,7 +16,7 @@ export const notionEnabled = () => Boolean(process.env.NOTION_TOKEN);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type NotionPage = { id: string; url: string; properties: Record<string, any> };
 
-async function queryDataSource(id: string, body: Record<string, unknown> = {}): Promise<NotionPage[]> {
+export async function queryDataSource(id: string, body: Record<string, unknown> = {}): Promise<NotionPage[]> {
   const pages: NotionPage[] = [];
   let cursor: string | undefined;
   do {
@@ -43,110 +42,7 @@ async function queryDataSource(id: string, body: Record<string, unknown> = {}): 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const text = (p: any): string =>
+export const text = (p: any): string =>
   (p?.title ?? p?.rich_text ?? []).map((t: { plain_text: string }) => t.plain_text).join("").trim();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const select = (p: any): string | null => p?.select?.name ?? null;
-
-// ---------- Miembros ----------
-export const AREAS: Record<string, string> = {
-  "Coordinación general": "Coordinación",
-  "Supervisión Administrativa": "Administrativa",
-  "Logística y Operaciones": "Administrativa",
-  "Marketing y Comunicación": "Administrativa",
-  "Supervisión Mecánica": "Mecánica",
-  "Estructuras y Chasis": "Mecánica",
-  "Dirección y Suspensión": "Mecánica",
-  "Aerodinámica y Carrocería": "Mecánica",
-  "Supervisión Propulsión": "Propulsión",
-  Powertrain: "Propulsión",
-  Energía: "Propulsión",
-  Electrónica: "Propulsión",
-  Pilotos: "Ingeniería",
-  "Por asignar": "Por asignar",
-};
-export const AREA_ORDER = ["Coordinación", "Administrativa", "Mecánica", "Propulsión", "Ingeniería", "Por asignar"];
-
-export type Member = {
-  id: string;
-  name: string;
-  subarea: string;
-  area: string;
-  rol: string | null;
-  estado: string | null;
-  condicion: string | null;
-};
-
-export async function getMembers(): Promise<Member[]> {
-  const pages = await queryDataSource(NOTION_SOURCES.miembros);
-  return pages
-    .map((p) => {
-      const subarea = select(p.properties["Subárea"]) ?? "Por asignar";
-      return {
-        id: p.id,
-        name: text(p.properties["Integrante"]),
-        subarea,
-        area: AREAS[subarea] ?? "Por asignar",
-        rol: select(p.properties["Rol"]),
-        estado: select(p.properties["Estado"]),
-        condicion: select(p.properties["Condición"]),
-      };
-    })
-    .filter((m) => m.name && m.estado !== "Miembro retirado")
-    .sort((a, b) => a.name.localeCompare(b.name, "es"));
-}
-
-// ---------- Calendario ----------
-export type CalendarEvent = {
-  id: string;
-  url: string;
-  title: string;
-  start: string;
-  end: string | null;
-  tipo: string | null;
-  estado: string | null;
-  lugar: string;
-  dirigidoA: string[];
-  notas: string;
-};
-
-export async function getEvents({ from, days }: { from?: Date; days?: number } = {}): Promise<CalendarEvent[]> {
-  const start = from ?? new Date();
-  const and: Record<string, unknown>[] = [
-    { property: "Fecha", date: { on_or_after: start.toISOString().slice(0, 10) } },
-    { property: "Estado", select: { does_not_equal: "Cancelada" } },
-  ];
-  if (days) {
-    const end = new Date(start.getTime() + days * 86_400_000);
-    and.push({ property: "Fecha", date: { on_or_before: end.toISOString().slice(0, 10) } });
-  }
-  const pages = await queryDataSource(NOTION_SOURCES.calendario, {
-    filter: { and },
-    sorts: [{ property: "Fecha", direction: "ascending" }],
-  });
-  return pages
-    .filter((p) => p.properties["Fecha"]?.date?.start)
-    .map((p) => ({
-      id: p.id,
-      url: p.url,
-      title: text(p.properties["Actividad"]) || "Sin título",
-      start: p.properties["Fecha"].date.start,
-      end: p.properties["Fecha"].date.end ?? null,
-      tipo: select(p.properties["Tipo"]),
-      estado: select(p.properties["Estado"]),
-      lugar: text(p.properties["Lugar"]),
-      dirigidoA: (p.properties["Dirigido a"]?.multi_select ?? []).map((o: { name: string }) => o.name),
-      notas: text(p.properties["Notas"]),
-    }));
-}
-
-/** Ejecuta una lectura de Notion y devuelve el error en vez de romper la página. */
-export async function safeNotion<T>(fn: () => Promise<T>): Promise<{ data: T | null; error: string | null }> {
-  await connection(); // datos en vivo: siempre se leen en el momento de la petición
-  if (!notionEnabled()) return { data: null, error: "Falta la variable NOTION_TOKEN." };
-  try {
-    return { data: await fn(), error: null };
-  } catch (e) {
-    return { data: null, error: e instanceof Error ? e.message : String(e) };
-  }
-}
+export const select = (p: any): string | null => p?.select?.name ?? null;

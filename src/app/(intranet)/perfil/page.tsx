@@ -1,38 +1,48 @@
 import { Save, User } from "lucide-react";
+import Avatar from "@/components/Avatar";
 import PageHeader from "@/components/PageHeader";
-import { getCurrentUser } from "@/lib/supabase/server";
+import { Badge, Label, btnPrimary, card, inputCls } from "@/components/ui";
+import { ROLE_STYLES } from "@/data/eco-motors";
+import { requireMe } from "@/lib/me";
+import { unitPath } from "@/lib/units";
 import { updateProfile } from "./actions";
 
-const fields = [
-  { name: "full_name", label: "Nombre completo", type: "text" },
-  { name: "position", label: "Cargo", type: "text" },
-  { name: "department", label: "Departamento", type: "text" },
-  { name: "phone", label: "Teléfono", type: "tel" },
-  { name: "birthday", label: "Fecha de cumpleaños", type: "date" },
-  { name: "avatar_url", label: "URL de tu foto", type: "url" },
-] as const;
-
 export default async function PerfilPage() {
-  const { user, profile } = (await getCurrentUser())!;
+  const { user, profile, member, units } = await requireMe();
+  const name = member?.full_name ?? profile?.full_name ?? "";
 
   return (
     <>
       <PageHeader icon={User} title="Mi perfil" subtitle={user.email} />
-      <form action={updateProfile} className="max-w-lg space-y-4 rounded-xl border border-neutral-200 bg-white p-6">
-        {fields.map((f) => (
-          <label key={f.name} className="block">
-            <span className="mb-1 block text-sm font-medium text-neutral-700">{f.label}</span>
-            <input
-              name={f.name}
-              type={f.type}
-              defaultValue={profile?.[f.name] ?? ""}
-              className="w-full rounded-lg border border-neutral-300 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
-            />
-          </label>
-        ))}
-        <button className="flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
-          <Save className="h-4 w-4" /> Guardar
-        </button>
+      {member ? (
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+          <Badge className={ROLE_STYLES[member.rol]}>{member.rol}</Badge>
+          <span className="text-neutral-500">{unitPath(units, member.unit_id).map((u) => u.name).join(" › ")}</span>
+        </div>
+      ) : (
+        <p className="mb-4 max-w-lg rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+          Tu cuenta aún no está vinculada a tu ficha de integrante. Pide a coordinación que añada tu correo (<b>{user.email}</b>) a tu ficha en Administración.
+        </p>
+      )}
+
+      <form action={updateProfile} className={`${card} max-w-lg space-y-4 p-6`}>
+        <div className="flex items-center gap-4">
+          <Avatar name={name} src={member?.avatar_url} size={80} />
+          {member && (
+            <Label label="Foto de perfil" className="flex-1">
+              <input name="avatar" type="file" accept="image/*" className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-2" />
+            </Label>
+          )}
+        </div>
+        <Label label="Nombre completo"><input name="full_name" defaultValue={name} className={inputCls} /></Label>
+        {member && (
+          <>
+            <Label label="Teléfono"><input name="phone" type="tel" defaultValue={member.phone ?? ""} className={inputCls} /></Label>
+            <Label label="Cumpleaños"><input name="birthday" type="date" defaultValue={member.birthday ?? ""} className={inputCls} /></Label>
+            <Label label="Sobre mí"><textarea name="bio" rows={3} defaultValue={member.bio ?? ""} className={inputCls} placeholder="Qué haces en el equipo, habilidades…" /></Label>
+          </>
+        )}
+        <button className={btnPrimary}><Save className="h-4 w-4" /> Guardar</button>
       </form>
     </>
   );

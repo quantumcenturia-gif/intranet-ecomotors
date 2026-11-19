@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
-import { getCurrentUser } from "@/lib/supabase/server";
+import { getMe } from "@/lib/me";
 
 export default function IntranetLayout({ children }: LayoutProps<"/">) {
   return (
@@ -13,13 +13,17 @@ export default function IntranetLayout({ children }: LayoutProps<"/">) {
 }
 
 async function Shell({ children }: { children: React.ReactNode }) {
-  const current = await getCurrentUser();
-  if (!current) redirect("/login");
-  const { user, profile } = current;
+  const me = await getMe();
+  if (!me) redirect("/login");
+  const { user, profile, member, isAdmin } = me;
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <Sidebar name={profile?.full_name || user.email || ""} role={profile?.role ?? "empleado"} />
+      <Sidebar
+        name={member?.full_name || profile?.full_name || user.email || ""}
+        role={member?.rol ?? (isAdmin ? "Coordinación" : "Sin ficha vinculada")}
+        isAdmin={isAdmin}
+      />
       <main className="min-w-0 flex-1 p-4 md:p-8">
         <div className="mx-auto max-w-5xl">
           <Suspense fallback={<Loading />}>{children}</Suspense>

@@ -1,8 +1,10 @@
 import { Cake } from "lucide-react";
 import Avatar from "@/components/Avatar";
-import { daysUntilBirthday, type Employee } from "@/data/employees";
+import { daysUntilBirthday } from "@/data/employees";
 
-export default function UpcomingBirthdays({ people, withinDays = 30 }: { people: Employee[]; withinDays?: number }) {
+type Person = { id: string; full_name: string | null; birthday: string | null; avatar_url: string | null };
+
+export default function UpcomingBirthdays({ people, withinDays = 30 }: { people: Person[]; withinDays?: number }) {
   const upcoming = people
     .filter((p) => p.birthday)
     .map((p) => ({ ...p, days: daysUntilBirthday(p.birthday!) }))

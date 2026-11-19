@@ -4,18 +4,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { CalendarDays, FileText, Home, LogOut, Megaphone, Menu, User, Users, X } from "lucide-react";
+import { CalendarDays, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
+  { href: "/tareas", label: "Tareas", icon: ListChecks },
   { href: "/noticias", label: "Noticias", icon: Megaphone },
   { href: "/directorio", label: "Directorio de Equipo", icon: Users },
   { href: "/calendario", label: "Calendario", icon: CalendarDays },
+  { href: "/proyectos", label: "Proyectos", icon: Rocket },
   { href: "/documentos", label: "Documentos", icon: FileText },
   { href: "/perfil", label: "Mi perfil", icon: User },
 ];
+const adminLink = { href: "/admin", label: "Administración", icon: Shield };
 
-export default function Sidebar({ name, role }: { name: string; role: string }) {
+export default function Sidebar({ name, role, isAdmin }: { name: string; role: string; isAdmin: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -37,7 +40,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
         <div className="checkered mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
 
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {links.map(({ href, label, icon: Icon }) => {
+          {[...links, ...(isAdmin ? [adminLink] : [])].map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
@@ -58,7 +61,7 @@ export default function Sidebar({ name, role }: { name: string; role: string }) 
 
         <div className="border-t border-white/10 p-4">
           <p className="truncate text-sm font-medium">{name}</p>
-          <p className="mb-3 text-xs text-brand-400">{role === "admin" ? "Coordinación" : "Integrante"}</p>
+          <p className="mb-3 text-xs text-brand-400">{role}</p>
           <form action="/auth/signout" method="post">
             <button className="flex items-center gap-2 text-sm text-neutral-400 hover:text-brand-400">
               <LogOut className="h-4 w-4" /> Cerrar sesión

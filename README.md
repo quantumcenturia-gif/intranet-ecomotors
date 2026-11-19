@@ -7,8 +7,20 @@ Intranet del Semillero Eco Motors (FIM UNI) hecha con **Next.js 16**, **Tailwind
 - 🔐 **Login y registro** con email y contraseña (Supabase Auth). Todas las páginas requieren sesión.
 - 🏠 **Inicio**: saludo, contadores y últimas noticias.
 - 📣 **Noticias**: los administradores publican y borran comunicados; el resto los lee.
-- 👥 **Directorio**: integrantes leídos en vivo de la base de Notion *Miembros por subárea*, agrupados por área, con filtros y buscador.
-- 📅 **Calendario**: actividades de los próximos 60 días leídas en vivo del *Calendario general* de Notion.
+- ✅ **Tareas** jerárquicas (tarea madre → subtareas) por unidad, con responsable, prioridad, fecha límite, avance, entrega, evidencias, revisión del encargado y comentarios.
+- 👥 **Directorio** con fotos, roles y ficha de cada integrante, agrupado por área.
+- 📅 **Calendario** editable por supervisores y encargados.
+- 🚀 **Proyectos** con imagen y tareas enlazadas.
+- 🛡️ **Administración** (coordinación): unidades, roles, correos de los integrantes y botón de **importar desde Notion** (respaldo).
+
+### Permisos
+| Rol | Puede |
+|---|---|
+| Coordinador general (o admin) | Todo |
+| Supervisor/a · Encargado/a | Crear, asignar, editar y validar tareas de su unidad y las que cuelgan de ella; publicar noticias y actividades |
+| Integrante | Ver las tareas de su subárea, actualizar avance/entrega/evidencias de sus tareas y crear tareas propias |
+
+La cuenta de cada persona se vincula a su ficha cuando coordinación escribe su correo en Administración.
 - 📁 **Documentos**: subir, descargar y borrar archivos (Supabase Storage, bucket privado).
 - 👤 **Mi perfil**: cada empleado edita su nombre, cargo, departamento y teléfono.
 - 📱 Diseño responsive con menú lateral que se pliega en el móvil.
@@ -17,7 +29,7 @@ Intranet del Semillero Eco Motors (FIM UNI) hecha con **Next.js 16**, **Tailwind
 
 ### 1. Crear el proyecto en Supabase
 1. Crea una cuenta gratuita en https://supabase.com y un proyecto nuevo.
-2. Ve a **SQL Editor**, pega el contenido de `supabase/schema.sql` y pulsa **Run**.
+2. Ve a **SQL Editor** y ejecuta, en este orden, `supabase/schema.sql` y `supabase/02_tareas_y_miembros.sql`.
    Esto crea las tablas, el bucket `documentos` y las reglas de seguridad (RLS).
 3. En **Project Settings → API** copia la *Project URL* y la clave *anon / publishable*.
 4. (Opcional) En **Authentication → Sign In / Providers** puedes desactivar "Confirm email" para pruebas, o desactivar el registro público si solo vas a dar de alta usuarios tú.

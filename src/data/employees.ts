@@ -1,14 +1,3 @@
-export type Employee = {
-  id: string;
-  full_name: string | null;
-  email: string | null;
-  position: string | null;
-  department: string | null;
-  phone: string | null;
-  birthday: string | null;
-  avatar_url: string | null;
-};
-
 /** Días que faltan para el próximo cumpleaños (0 = hoy). */
 export function daysUntilBirthday(birthday: string, today = new Date()) {
   const [, m, d] = birthday.split("-").map(Number);

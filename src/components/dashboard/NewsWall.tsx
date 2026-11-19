@@ -1,8 +1,9 @@
+/* eslint-disable @next/next/no-img-element -- imágenes subidas por el equipo */
 import Link from "next/link";
 import { ArrowRight, Megaphone } from "lucide-react";
 import { formatDate } from "@/lib/format";
 
-type News = { id: number; title: string; body: string; created_at: string };
+type News = { id: number; title: string; body: string; created_at: string; image_url?: string | null };
 
 export default function NewsWall({ news }: { news: News[] }) {
   return (
@@ -18,10 +19,13 @@ export default function NewsWall({ news }: { news: News[] }) {
       {news.length ? (
         <ul className="space-y-4">
           {news.map((n) => (
-            <li key={n.id} className="border-l-4 border-brand-500 pl-4">
+            <li key={n.id} className="flex gap-4 border-l-4 border-brand-500 pl-4">
+              {n.image_url && <img src={n.image_url} alt="" className="h-16 w-24 shrink-0 rounded-md object-cover" />}
+              <div className="min-w-0">
               <p className="font-medium">{n.title}</p>
               <p className="line-clamp-2 text-sm text-neutral-600">{n.body}</p>
               <p className="mt-1 text-xs text-neutral-400">{formatDate(n.created_at)}</p>
+              </div>
             </li>
           ))}
         </ul>
