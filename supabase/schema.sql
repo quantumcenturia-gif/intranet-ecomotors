@@ -84,6 +84,13 @@ drop policy if exists "autor o admin borra documentos" on public.documents;
 create policy "autor o admin borra documentos" on public.documents
   for delete to authenticated using (uploaded_by = auth.uid() or public.is_admin());
 
+-- ---------- Permisos de la Data API ----------
+-- Necesarios si el proyecto se creó sin "Grant API access to new tables automatically"
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.profiles, public.announcements, public.documents to authenticated;
+grant usage, select on all sequences in schema public to authenticated;
+grant execute on function public.is_admin() to authenticated;
+
 -- ---------- Storage ----------
 insert into storage.buckets (id, name, public)
 values ('documentos', 'documentos', false)
