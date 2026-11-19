@@ -25,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <PageHeader icon={Home} title={`Hola, ${profile?.full_name?.split(" ")[0] ?? ""} 👋`} subtitle={TEAM.tagline} />
+      <PageHeader icon={Home} title={`Hola, ${profile?.full_name?.split(" ")[0] ?? ""} 👋`} subtitle={TEAM.slogan} />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Stat href="/directorio" icon={Users} value={activos ?? "—"} label="Integrantes activos" />
@@ -50,11 +50,11 @@ export default async function HomePage() {
 
 function Stat({ href, icon: Icon, value, label }: { href: string; icon: typeof Users; value: number | string; label: string }) {
   return (
-    <Link href={href} className="flex items-center gap-4 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 p-5 text-white shadow-sm transition hover:shadow-md">
-      <Icon className="h-8 w-8 opacity-80" />
+    <Link href={href} className="group relative flex items-center gap-4 overflow-hidden rounded-xl border-l-4 border-brand-600 bg-black p-5 text-white shadow-sm transition hover:shadow-lg">
+      <Icon className="h-8 w-8 text-brand-500" />
       <div>
-        <p className="text-2xl font-semibold">{value}</p>
-        <p className="text-sm text-blue-100">{label}</p>
+        <p className="text-3xl font-bold">{value}</p>
+        <p className="text-sm text-neutral-400">{label}</p>
       </div>
     </Link>
   );

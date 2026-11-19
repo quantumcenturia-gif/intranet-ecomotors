@@ -10,7 +10,7 @@ export default function Avatar({ name, src, size = 48 }: { name: string | null; 
   return src ? (
     <img src={src} alt={name ?? ""} style={style} className="shrink-0 rounded-full object-cover" />
   ) : (
-    <div style={style} className="flex shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+    <div style={style} className="flex shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
       {initials}
     </div>
   );

@@ -4,6 +4,7 @@ export const TEAM = {
   name: "Eco Motors",
   tagline: "Semillero Eco Motors · FIM UNI · Desde 2023",
   email: "team.ecomotors@uni.edu.pe",
+  slogan: "Más que un equipo, una pasión por la innovación",
 };
 
 const notion = (id: string) => `https://www.notion.so/${id}`;
@@ -31,16 +32,16 @@ export const projects = [
 ];
 
 export const ROLE_STYLES: Record<string, string> = {
-  "Coordinador general": "bg-red-100 text-red-700",
-  "Supervisor/a": "bg-yellow-100 text-yellow-800",
-  "Encargado/a": "bg-orange-100 text-orange-700",
-  Integrante: "bg-green-100 text-green-700",
-  "Egresado asesor": "bg-purple-100 text-purple-700",
+  "Coordinador general": "bg-brand-600 text-white",
+  "Supervisor/a": "bg-neutral-900 text-white",
+  "Encargado/a": "bg-brand-100 text-brand-700",
+  Integrante: "bg-neutral-100 text-neutral-700",
+  "Egresado asesor": "border border-neutral-300 text-neutral-600",
 };
 
 export const EVENT_STYLES: Record<string, string> = {
-  "Reunión de directores": "bg-blue-100 text-blue-700",
-  "Trabajo en taller": "bg-orange-100 text-orange-700",
-  "Prueba de pilotos": "bg-red-100 text-red-700",
-  Otro: "bg-slate-100 text-slate-700",
+  "Reunión de directores": "bg-neutral-900 text-white",
+  "Trabajo en taller": "bg-brand-100 text-brand-700",
+  "Prueba de pilotos": "bg-brand-600 text-white",
+  Otro: "bg-neutral-100 text-neutral-700",
 };

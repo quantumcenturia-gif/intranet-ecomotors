@@ -18,19 +18,19 @@ export default async function PerfilPage() {
   return (
     <>
       <PageHeader icon={User} title="Mi perfil" subtitle={user.email} />
-      <form action={updateProfile} className="max-w-lg space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+      <form action={updateProfile} className="max-w-lg space-y-4 rounded-xl border border-neutral-200 bg-white p-6">
         {fields.map((f) => (
           <label key={f.name} className="block">
-            <span className="mb-1 block text-sm font-medium text-slate-700">{f.label}</span>
+            <span className="mb-1 block text-sm font-medium text-neutral-700">{f.label}</span>
             <input
               name={f.name}
               type={f.type}
               defaultValue={profile?.[f.name] ?? ""}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-lg border border-neutral-300 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
             />
           </label>
         ))}
-        <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
+        <button className="flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
           <Save className="h-4 w-4" /> Guardar
         </button>
       </form>

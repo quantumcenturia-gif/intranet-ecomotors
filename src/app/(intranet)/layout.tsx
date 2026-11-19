@@ -31,7 +31,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
 
 function Loading() {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center text-slate-400">
+    <div className="flex min-h-[50vh] items-center justify-center text-neutral-400">
       <Loader2 className="h-6 w-6 animate-spin" />
     </div>
   );

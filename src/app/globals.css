@@ -5,6 +5,29 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Paleta oficial Eco Motors: rojo #D90416 · negro #000000 · blanco #FFFFFF */
+@theme {
+  --color-brand-50: #fef2f2;
+  --color-brand-100: #fee2e3;
+  --color-brand-200: #fecacd;
+  --color-brand-300: #fca5aa;
+  --color-brand-400: #f56b74;
+  --color-brand-500: #ec2c3a;
+  --color-brand-600: #d90416;
+  --color-brand-700: #b5030f;
+  --color-brand-800: #96070f;
+  --color-brand-900: #7c0b12;
+}
+
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-neutral-100 text-neutral-900 antialiased;
+}
+
+/* Detalles de carreras: bandera a cuadros y franjas diagonales */
+.checkered {
+  background-image: conic-gradient(#fff 25%, #000 0 50%, #fff 0 75%, #000 0);
+  background-size: 16px 16px;
+}
+.racing-stripes {
+  background-image: linear-gradient(115deg, transparent 0 68%, #d90416 68% 74%, transparent 74% 77%, #d90416 77% 80%, transparent 80%);
 }

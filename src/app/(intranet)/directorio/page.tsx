@@ -45,12 +45,12 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
         <>
           <form className="relative mb-4">
             {selectedArea && <input type="hidden" name="area" value={selectedArea} />}
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -tranneutral-y-1/2 text-neutral-400" />
             <input
               name="q"
               defaultValue={query}
               placeholder="Buscar por nombre, subárea o rol…"
-              className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-lg border border-neutral-300 bg-white py-2 pl-9 pr-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
             />
           </form>
 
@@ -60,7 +60,7 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
                 key={a || "todas"}
                 href={href(a)}
                 className={`rounded-full px-3 py-1 text-sm ${
-                  selectedArea === a ? "bg-blue-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-blue-50"
+                  selectedArea === a ? "bg-brand-600 text-white" : "bg-white text-neutral-600 ring-1 ring-neutral-200 hover:bg-brand-50"
                 }`}
               >
                 {a || "Todas"}
@@ -70,33 +70,33 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
 
           {groups.map((g) => (
             <section key={g.area} className="mb-8">
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">{g.area}</h2>
+              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500">{g.area}</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {g.people.map((m) => {
                   const profile = profileByName.get(normalizeName(m.name));
                   return (
-                    <div key={m.id} className="flex flex-col items-center rounded-xl border border-slate-200 bg-white p-5 text-center">
+                    <div key={m.id} className="flex flex-col items-center rounded-xl border border-neutral-200 bg-white p-5 text-center">
                       <Avatar name={m.name} src={profile?.avatar_url} size={72} />
                       <p className="mt-3 font-semibold">{m.name}</p>
-                      <p className="text-sm text-blue-700">{m.subarea}</p>
+                      <p className="text-sm text-brand-700">{m.subarea}</p>
                       <div className="mt-2 mb-4 flex flex-wrap justify-center gap-1">
-                        {m.rol && <span className={`rounded-full px-2 py-0.5 text-xs ${ROLE_STYLES[m.rol] ?? "bg-slate-100"}`}>{m.rol}</span>}
+                        {m.rol && <span className={`rounded-full px-2 py-0.5 text-xs ${ROLE_STYLES[m.rol] ?? "bg-neutral-100"}`}>{m.rol}</span>}
                         {m.estado && m.estado !== "Activo" && (
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{m.estado}</span>
+                          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600">{m.estado}</span>
                         )}
                         {m.condicion && m.condicion !== "Miembro confirmado" && (
-                          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs text-sky-700">{m.condicion}</span>
+                          <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700">{m.condicion}</span>
                         )}
                       </div>
                       {profile?.email ? (
                         <a
                           href={`mailto:${profile.email}`}
-                          className="mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                          className="mt-auto flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 py-2 text-sm font-medium text-white hover:bg-brand-700"
                         >
                           <Mail className="h-4 w-4" /> Enviar correo
                         </a>
                       ) : (
-                        <p className="mt-auto text-xs text-slate-400">Aún no se ha registrado en la intranet</p>
+                        <p className="mt-auto text-xs text-neutral-400">Aún no se ha registrado en la intranet</p>
                       )}
                     </div>
                   );
@@ -104,7 +104,7 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
               </div>
             </section>
           ))}
-          {!groups.length && <p className="text-sm text-slate-500">No se encontraron integrantes.</p>}
+          {!groups.length && <p className="text-sm text-neutral-500">No se encontraron integrantes.</p>}
         </>
       )}
     </>
