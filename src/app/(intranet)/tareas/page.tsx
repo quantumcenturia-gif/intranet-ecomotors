@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ListChecks, Plus } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import TaskList from "@/components/tasks/TaskList";
-import { btnPrimary, inputCls } from "@/components/ui";
+import { btnPrimary, selectSm } from "@/components/ui";
 import { TASK_ESTADOS, estadoVisible } from "@/data/eco-motors";
 import { requireMe } from "@/lib/me";
 import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
@@ -19,7 +19,8 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
   if (vista === "mias") q = q.eq("assignee_id", member?.id ?? "00000000-0000-0000-0000-000000000000");
   if (unidad) q = q.in("unit_id", subtree(units, unidad));
   if (estado && estado !== "Atrasada") q = q.eq("estado", estado);
-  const { data } = await q.returns<TaskRow[]>();
+  const { data, error } = await q.returns<TaskRow[]>();
+  if (error) throw new Error(error.message);
   let tasks = data ?? [];
   if (estado === "Atrasada") tasks = tasks.filter((t) => estadoVisible(t) === "Atrasada");
   if (!estado) tasks = tasks.filter((t) => !["Completada y validada", "Cancelada"].includes(t.estado));
@@ -53,9 +54,9 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
           {tab("mias", "Mis tareas")}
           {tab("equipo", isManager ? "Mi equipo" : "Mi subárea")}
         </div>
-        <form className="flex flex-1 flex-wrap gap-2">
+        <form className="flex flex-wrap items-center gap-2">
           <input type="hidden" name="vista" value={vista} />
-          <select name="unidad" defaultValue={unidad} className={`${inputCls} w-auto`}>
+          <select name="unidad" defaultValue={unidad} className={selectSm}>
             <option value="">Todas las unidades</option>
             {flattenTree(units).map(({ unit, depth }) => (
               <option key={unit.id} value={unit.id}>
@@ -63,7 +64,7 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
               </option>
             ))}
           </select>
-          <select name="estado" defaultValue={estado} className={`${inputCls} w-auto`}>
+          <select name="estado" defaultValue={estado} className={selectSm}>
             <option value="">Abiertas</option>
             {[...TASK_ESTADOS, "Atrasada"].map((e) => (
               <option key={e}>{e}</option>

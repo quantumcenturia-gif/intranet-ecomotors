@@ -19,10 +19,11 @@ export type Task = {
   resultado_revision: string | null;
   revisado_at: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export const TASK_SELECT =
-  "*, assignee:members!tasks_assignee_id_fkey(id,full_name,avatar_url), unit:units(id,name), project:projects(id,name), subtasks:tasks!tasks_parent_id_fkey(id,estado)";
+  "*, assignee:members!tasks_assignee_id_fkey(id,full_name,avatar_url), unit:units(id,name), project:projects(id,name), subtasks:tasks!parent_id(id,estado)";
 
 export type TaskRow = Task & {
   assignee: { id: string; full_name: string; avatar_url: string | null } | null;

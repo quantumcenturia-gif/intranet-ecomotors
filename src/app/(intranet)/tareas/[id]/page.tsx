@@ -23,11 +23,12 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
   const id = Number((await params).id);
   const { supabase, member, units, manageable } = await requireMe();
 
-  const { data: task } = await supabase
+  const { data: task, error } = await supabase
     .from("tasks")
     .select(`${TASK_SELECT}, creator:members!tasks_created_by_fkey(id,full_name,avatar_url), revisor:members!tasks_revisor_id_fkey(id,full_name,avatar_url)`)
     .eq("id", id)
     .maybeSingle<TaskRow & { creator: Person; revisor: Person }>();
+  if (error) throw new Error(error.message);
   if (!task) notFound();
 
   // Cadena de tareas madre (para la ruta de navegación)
@@ -115,7 +116,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <h2 className="mb-4 flex items-center gap-2 font-semibold">
                 <Send className="h-5 w-5 text-brand-600" /> Mi entrega
               </h2>
-              <form action={updateProgress} className="grid gap-4 sm:grid-cols-2">
+              <form key={`p-${task.updated_at}`} action={updateProgress} className="grid gap-4 sm:grid-cols-2">
                 <input type="hidden" name="id" value={task.id} />
                 <Label label={`Avance (%)`}>
                   <input type="number" name="avance" min={0} max={100} step={5} defaultValue={task.avance} className={inputCls} />
@@ -260,7 +261,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                 </div>
               )}
               {canManage && (
-                <form action={reviewTask} className="space-y-3">
+                <form key={`r-${task.updated_at}`} action={reviewTask} className="space-y-3">
                   <input type="hidden" name="id" value={task.id} />
                   <select name="estado" defaultValue="Completada y validada" className={inputCls}>
                     <option>Completada y validada</option>
@@ -280,7 +281,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <summary className="flex cursor-pointer items-center gap-2 font-semibold">
                 <Pencil className="h-4 w-4 text-brand-600" /> Editar tarea
               </summary>
-              <form action={updateTask} className="mt-4 space-y-4 [&_.sm\:grid-cols-2]:grid-cols-1">
+              <form key={`e-${task.updated_at}`} action={updateTask} className="mt-4 space-y-4 [&_.sm\:grid-cols-2]:grid-cols-1">
                 <input type="hidden" name="id" value={task.id} />
                 <TaskFields task={task} units={units} manageable={manageable} members={members ?? []} projects={projects ?? []} canAssign />
                 <button className={`${btnDark} w-full`}>Guardar cambios</button>

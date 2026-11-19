@@ -54,9 +54,9 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
 
       <section className={`${card} mb-6 p-5`}>
         <h2 className="mb-3 flex items-center gap-2 font-semibold"><UserPlus className="h-5 w-5 text-brand-600" /> Añadir integrante</h2>
-        <form action={saveMember} className="flex flex-wrap items-center gap-2">
-          <input name="full_name" required placeholder="Nombre completo" className={`${inputCls} w-56`} />
-          <input name="email" type="email" placeholder="correo@uni.pe" className={`${inputCls} w-56`} />
+        <form action={saveMember} className="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto_auto_auto]">
+          <input name="full_name" required placeholder="Nombre completo" className={inputCls} />
+          <input name="email" type="email" placeholder="correo@uni.pe" className={inputCls} />
           <UnitSelect tree={tree} />
           <Opt name="rol" value="Integrante" list={ROLES} />
           <button className={btnPrimary}><UserPlus className="h-4 w-4" /> Añadir</button>
@@ -68,16 +68,16 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
           <h2 className="font-semibold">Integrantes ({members.length})</h2>
           <form className="relative">
             <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-            <input name="q" defaultValue={q} placeholder="Buscar…" className={`${inputCls} w-56 pl-8`} />
+            <input name="q" defaultValue={q} placeholder="Buscar…" className="w-56 rounded-lg border border-neutral-300 py-2 pl-8 pr-3 text-sm" />
           </form>
         </div>
         <div className="divide-y divide-neutral-100">
           {members.map((m) => (
-            <form key={m.id} action={saveMember} className="flex flex-wrap items-center gap-2 p-3">
+            <form key={m.id} action={saveMember} className="grid items-center gap-2 p-3 sm:grid-cols-2 xl:grid-cols-[auto_minmax(0,1.5fr)_minmax(0,1.3fr)_repeat(4,minmax(0,1fr))_auto] [&_select]:w-full">
               <input type="hidden" name="id" value={m.id} />
               <span className={`h-2 w-2 rounded-full ${m.profile_id ? "bg-emerald-500" : "bg-neutral-300"}`} title={m.profile_id ? "Cuenta vinculada" : "Sin cuenta"} />
-              <input name="full_name" defaultValue={m.full_name} className="min-w-40 flex-1 rounded-md border border-transparent px-2 py-1.5 text-sm hover:border-neutral-300 focus:border-brand-500 focus:outline-none" />
-              <input name="email" type="email" defaultValue={m.email ?? ""} placeholder="correo" className="w-48 rounded-md border border-neutral-300 px-2 py-1.5 text-xs" />
+              <input name="full_name" defaultValue={m.full_name} className="min-w-0 rounded-md border border-transparent px-2 py-1.5 text-sm hover:border-neutral-300 focus:border-brand-500 focus:outline-none" />
+              <input name="email" type="email" defaultValue={m.email ?? ""} placeholder="correo" className="min-w-0 rounded-md border border-neutral-300 px-2 py-1.5 text-xs" />
               <UnitSelect tree={tree} value={m.unit_id} />
               <Opt name="rol" value={m.rol} list={ROLES} />
               <Opt name="estado" value={m.estado} list={ESTADOS_MIEMBRO} />
