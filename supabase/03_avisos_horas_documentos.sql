@@ -139,7 +139,10 @@ begin
   mail := lower(trim(m.email));
 
   select id into uid from auth.users where lower(email) = mail;
-  if uid is not null then return 'existe'; end if;
+  if uid is not null then
+    update public.members set profile_id = uid where id = m.id and profile_id is null;
+    return 'existe';
+  end if;
 
   uid := gen_random_uuid();
   insert into auth.users (

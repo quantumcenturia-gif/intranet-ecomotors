@@ -101,7 +101,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <h2 className="flex items-center gap-2 font-semibold">
                 <GitBranch className="h-5 w-5 text-brand-600" /> Subtareas
               </h2>
-              {member && (
+              {(member || canManage) && (
                 <Link href={`/tareas/nueva?parent=${task.id}`} className={btnGhost}>
                   <Plus className="h-4 w-4" /> Añadir subtarea
                 </Link>

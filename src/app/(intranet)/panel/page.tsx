@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { AlertTriangle, BarChart3, ClipboardCheck } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
@@ -11,6 +12,7 @@ import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
 import { flattenTree } from "@/lib/units";
 
 export default async function PanelPage() {
+  await connection();
   const { supabase, units, manageable, isManager } = await requireMe();
   if (!isManager) redirect("/");
   const { from, to, label } = monthRange();

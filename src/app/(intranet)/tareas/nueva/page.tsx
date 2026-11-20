@@ -20,7 +20,7 @@ export default async function NuevaTareaPage({ searchParams }: PageProps<"/tarea
     supabase.from("tasks").select("id,title").not("estado", "in", "(Completada y validada,Cancelada)").order("created_at", { ascending: false }).limit(200),
   ]);
 
-  if (!member) {
+  if (!member && !isManager) {
     return (
       <>
         <PageHeader icon={Plus} title="Nueva tarea" />
@@ -58,7 +58,7 @@ export default async function NuevaTareaPage({ searchParams }: PageProps<"/tarea
         )}
 
         <TaskFields
-          task={{ unit_id: parent?.unit_id ?? member.unit_id, project_id: parent?.project_id ?? null }}
+          task={{ unit_id: parent?.unit_id ?? member?.unit_id, project_id: parent?.project_id ?? null }}
           units={units}
           manageable={manageable}
           members={members ?? []}

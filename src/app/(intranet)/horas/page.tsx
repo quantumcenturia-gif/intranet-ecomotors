@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { ChevronLeft, ChevronRight, Clock, Plus, Trash2 } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import PageHeader from "@/components/PageHeader";
@@ -10,6 +11,7 @@ import { addHours, deleteHours } from "./actions";
 const fmtH = (n: number) => `${Number(n.toFixed(2))} h`;
 
 export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
+  await connection();
   const sp = await searchParams;
   const { month, from, to, label } = monthRange(typeof sp.mes === "string" ? sp.mes : undefined);
   const { supabase, member, manageable, isManager, units } = await requireMe();

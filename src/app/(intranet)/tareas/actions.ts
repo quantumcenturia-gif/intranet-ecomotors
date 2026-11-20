@@ -13,9 +13,9 @@ const fail = (msg: string): never => {
 };
 
 export async function createTask(formData: FormData) {
-  const { supabase, member, manageable } = await requireMe();
-  if (!member) fail("Tu cuenta no está vinculada a una ficha de integrante.");
-  const unit_id = str(formData, "unit_id") ?? member!.unit_id;
+  const { supabase, member, manageable, isAdmin } = await requireMe();
+  if (!member && !isAdmin) fail("Tu cuenta no está vinculada a una ficha de integrante.");
+  const unit_id = str(formData, "unit_id") ?? member?.unit_id ?? fail("Elige una unidad.");
   const isManager = manageable.has(unit_id);
   const { data, error } = await supabase
     .from("tasks")
@@ -23,13 +23,13 @@ export async function createTask(formData: FormData) {
       title: str(formData, "title") ?? fail("Escribe un título."),
       description: str(formData, "description"),
       unit_id,
-      assignee_id: isManager ? str(formData, "assignee_id") : member!.id,
+      assignee_id: isManager ? str(formData, "assignee_id") : member?.id,
       parent_id: str(formData, "parent_id") ? Number(formData.get("parent_id")) : null,
       project_id: str(formData, "project_id"),
       tipo: isManager ? (str(formData, "tipo") ?? "Del encargado") : "Del integrante",
       prioridad: str(formData, "prioridad") ?? "MEDIA",
       fecha_limite: str(formData, "fecha_limite"),
-      created_by: member!.id,
+      created_by: member?.id ?? null,
     })
     .select("id")
     .single();
