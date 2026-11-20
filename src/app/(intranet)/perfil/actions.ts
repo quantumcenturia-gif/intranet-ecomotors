@@ -18,6 +18,8 @@ export async function updateProfile(formData: FormData) {
         phone: s("phone"),
         birthday: s("birthday"),
         bio: s("bio"),
+        especialidad: s("especialidad"),
+        ciclo: s("ciclo") ? Math.min(12, Math.max(1, Number(s("ciclo")))) : null,
         ...(avatar_url && { avatar_url }),
       })
       .eq("id", member.id);

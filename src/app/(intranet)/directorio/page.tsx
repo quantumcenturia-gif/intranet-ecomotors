@@ -62,6 +62,9 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
                 <Avatar name={m.full_name} src={m.avatar_url} size={72} />
                 <p className="mt-3 font-semibold">{m.full_name}</p>
                 <p className="text-sm text-brand-700">{unitName.get(m.unit_id)}</p>
+                {m.especialidad && (
+                  <p className="text-xs text-neutral-500">{m.especialidad}{m.ciclo ? ` · ${m.ciclo}.º ciclo` : ""}</p>
+                )}
                 <div className="mt-2 flex flex-wrap justify-center gap-1">
                   <Badge className={ROLE_STYLES[m.rol] ?? "bg-neutral-100"}>{m.rol}</Badge>
                   {m.estado !== "Activo" && <Badge className="bg-neutral-100 text-neutral-600">{m.estado}</Badge>}

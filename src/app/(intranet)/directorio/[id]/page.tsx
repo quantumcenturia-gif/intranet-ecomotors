@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Cake, Mail, Phone } from "lucide-react";
+import { ArrowLeft, Cake, GraduationCap, Mail, Phone } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import TaskList from "@/components/tasks/TaskList";
 import { Badge, card } from "@/components/ui";
@@ -36,6 +36,11 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
           <div className="flex-1 text-center sm:text-left">
             <h1 className="text-2xl font-bold">{m.full_name}</h1>
             <p className="text-sm text-neutral-500">{unitPath(units, m.unit_id).map((u) => u.name).join(" › ")}</p>
+            {m.especialidad && (
+              <p className="flex items-center justify-center gap-1.5 text-sm text-neutral-600 sm:justify-start">
+                <GraduationCap className="h-4 w-4" /> {m.especialidad}{m.ciclo ? ` · ${m.ciclo}.º ciclo` : ""}
+              </p>
+            )}
             <div className="mt-2 flex flex-wrap justify-center gap-1 sm:justify-start">
               <Badge className={ROLE_STYLES[m.rol]}>{m.rol}</Badge>
               {m.estado !== "Activo" && <Badge className="bg-neutral-100">{m.estado}</Badge>}

@@ -14,6 +14,8 @@ export type Member = {
   birthday: string | null;
   avatar_url: string | null;
   bio: string | null;
+  especialidad?: string | null;
+  ciclo?: number | null;
   profile_id: string | null;
 };
 

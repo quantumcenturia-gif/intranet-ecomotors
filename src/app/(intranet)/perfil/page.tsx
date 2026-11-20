@@ -37,6 +37,10 @@ export default async function PerfilPage() {
         <Label label="Nombre completo"><input name="full_name" defaultValue={name} className={inputCls} /></Label>
         {member && (
           <>
+            <div className="grid grid-cols-[minmax(0,1fr)_6rem] gap-3">
+              <Label label="Especialidad"><input name="especialidad" defaultValue={member.especialidad ?? ""} placeholder="Ing. Mecánica" className={inputCls} /></Label>
+              <Label label="Ciclo"><input name="ciclo" type="number" min={1} max={12} defaultValue={member.ciclo ?? ""} className={inputCls} /></Label>
+            </div>
             <Label label="Teléfono"><input name="phone" type="tel" defaultValue={member.phone ?? ""} className={inputCls} /></Label>
             <Label label="Cumpleaños"><input name="birthday" type="date" defaultValue={member.birthday ?? ""} className={inputCls} /></Label>
             <Label label="Sobre mí"><textarea name="bio" rows={3} defaultValue={member.bio ?? ""} className={inputCls} placeholder="Qué haces en el equipo, habilidades…" /></Label>
