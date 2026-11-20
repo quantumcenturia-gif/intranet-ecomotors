@@ -1,15 +1,25 @@
 "use client";
 
-import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useActionState } from "react";
 import { Loader2 } from "lucide-react";
 import AuthShell from "@/components/auth/AuthShell";
 import { setNewPassword } from "../login/actions";
 
 export default function NuevaContrasenaPage() {
+  return (
+    <Suspense>
+      <Form />
+    </Suspense>
+  );
+}
+
+function Form() {
+  const first = useSearchParams().get("primera") === "1";
   const [state, action, pending] = useActionState(setNewPassword, undefined);
   const input = "w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200";
   return (
-    <AuthShell title="Nueva contraseña" subtitle="Elige una contraseña para tu cuenta">
+    <AuthShell title={first ? "¡Bienvenido/a!" : "Nueva contraseña"} subtitle={first ? "Por seguridad, cambia la contraseña provisional que te dieron" : "Elige una contraseña para tu cuenta"}>
       <form action={action} className="space-y-4">
         <label className="block">
           <span className="mb-1 block text-sm font-medium text-neutral-700">Nueva contraseña</span>

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { CheckCircle2, DownloadCloud, Link2, Save, Search, Shield, UserPlus } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import AccountsPanel from "@/components/admin/AccountsPanel";
 import { btnDark, btnPrimary, card, inputCls } from "@/components/ui";
 import { CONDICIONES, ESTADOS_MIEMBRO, ROLES } from "@/data/eco-motors";
 import { normalizeName } from "@/data/employees";
@@ -46,11 +47,16 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
         <section className={`${card} p-5`}>
           <h2 className="mb-1 flex items-center gap-2 font-semibold"><Link2 className="h-5 w-5 text-brand-600" /> Cuentas vinculadas</h2>
           <p className="text-sm text-neutral-600">
-            <b>{linked}</b> de {data?.length ?? 0} integrantes tienen cuenta. Para vincular a alguien, escribe su correo en su ficha:
-            cuando se registre (o si ya lo hizo) con ese correo, su cuenta queda enlazada y podrá ver y entregar sus tareas.
+            <b>{linked}</b> de {data?.length ?? 0} integrantes tienen cuenta. El punto verde junto al nombre indica quién ya puede entrar.
+            Para dar acceso a alguien nuevo: añade su ficha con su correo y pulsa «Crear cuentas».
           </p>
         </section>
       </div>
+
+      <AccountsPanel
+        pending={(data ?? []).filter((m) => m.email && !m.profile_id && m.estado !== "Miembro retirado").length}
+        members={(data ?? []).map((m) => ({ id: m.id, full_name: m.full_name, email: m.email, hasAccount: !!m.profile_id }))}
+      />
 
       <section className={`${card} mb-6 p-5`}>
         <h2 className="mb-3 flex items-center gap-2 font-semibold"><UserPlus className="h-5 w-5 text-brand-600" /> Añadir integrante</h2>

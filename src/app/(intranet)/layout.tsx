@@ -16,6 +16,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   const me = await getMe();
   if (!me) redirect("/login");
   const { supabase, user, profile, member, isAdmin, isManager } = me;
+  if (profile?.must_change_password) redirect("/nueva-contrasena?primera=1");
   const { count: unread } = member
     ? await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("member_id", member.id).is("read_at", null)
     : { count: 0 };

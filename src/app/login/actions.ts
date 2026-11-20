@@ -59,5 +59,7 @@ export async function setNewPassword(_: AuthState, formData: FormData): Promise<
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message.includes("different") ? "La nueva contraseña debe ser distinta de la anterior." : error.message };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) await supabase.from("profiles").update({ must_change_password: false }).eq("id", user.id);
   redirect("/?pw=ok");
 }

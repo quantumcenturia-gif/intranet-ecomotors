@@ -118,3 +118,68 @@ alter table public.documents add constraint documents_categoria_check
 grant select, insert, update, delete on public.notifications, public.time_entries to authenticated;
 grant usage, select on all sequences in schema public to authenticated;
 grant execute on all functions in schema public to authenticated;
+
+-- ---------- Cuentas creadas por coordinación ----------
+-- La persona entra con su correo y la contraseña que le dé coordinación,
+-- y la web le obliga a cambiarla en su primer acceso.
+alter table public.profiles add column if not exists must_change_password boolean not null default false;
+
+create or replace function public.admin_create_account(p_member uuid, p_password text)
+returns text language plpgsql security definer set search_path = public, extensions as $$
+declare
+  m public.members;
+  uid uuid;
+  mail text;
+begin
+  if not public.is_admin() then raise exception 'Solo coordinación puede crear cuentas'; end if;
+  if length(coalesce(p_password, '')) < 8 then raise exception 'La contraseña debe tener al menos 8 caracteres'; end if;
+  select * into m from public.members where id = p_member;
+  if m.id is null then raise exception 'Ficha no encontrada'; end if;
+  if m.email is null then raise exception 'La ficha no tiene correo'; end if;
+  mail := lower(trim(m.email));
+
+  select id into uid from auth.users where lower(email) = mail;
+  if uid is not null then return 'existe'; end if;
+
+  uid := gen_random_uuid();
+  insert into auth.users (
+    instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, recovery_token, email_change_token_new, email_change
+  ) values (
+    '00000000-0000-0000-0000-000000000000', uid, 'authenticated', 'authenticated', mail,
+    extensions.crypt(p_password, extensions.gen_salt('bf')), now(),
+    '{"provider":"email","providers":["email"]}'::jsonb, jsonb_build_object('full_name', m.full_name), now(), now(),
+    '', '', '', ''
+  );
+  insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+  values (gen_random_uuid(), uid, uid::text,
+          jsonb_build_object('sub', uid::text, 'email', mail, 'email_verified', true),
+          'email', now(), now(), now());
+
+  -- El trigger de auth.users ya creó el perfil y lo enlazó con la ficha
+  update public.profiles set must_change_password = true where id = uid;
+  update public.members set profile_id = uid where id = m.id;
+  return 'creada';
+end; $$;
+
+create or replace function public.admin_reset_password(p_member uuid, p_password text)
+returns text language plpgsql security definer set search_path = public, extensions as $$
+declare
+  m public.members;
+  uid uuid;
+begin
+  if not public.is_admin() then raise exception 'Solo coordinación puede cambiar contraseñas'; end if;
+  if length(coalesce(p_password, '')) < 8 then raise exception 'La contraseña debe tener al menos 8 caracteres'; end if;
+  select * into m from public.members where id = p_member;
+  select id into uid from auth.users where lower(email) = lower(trim(m.email));
+  if uid is null then return 'sin cuenta'; end if;
+  update auth.users set encrypted_password = extensions.crypt(p_password, extensions.gen_salt('bf')), updated_at = now() where id = uid;
+  update public.profiles set must_change_password = true where id = uid;
+  return 'ok';
+end; $$;
+
+revoke all on function public.admin_create_account(uuid, text) from public, anon;
+revoke all on function public.admin_reset_password(uuid, text) from public, anon;
+grant execute on function public.admin_create_account(uuid, text) to authenticated;
+grant execute on function public.admin_reset_password(uuid, text) to authenticated;
