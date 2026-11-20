@@ -29,7 +29,7 @@ La cuenta de cada persona se vincula a su ficha cuando coordinación escribe su 
 
 ### 1. Crear el proyecto en Supabase
 1. Crea una cuenta gratuita en https://supabase.com y un proyecto nuevo.
-2. Ve a **SQL Editor** y ejecuta, en este orden, `supabase/schema.sql` y `supabase/02_tareas_y_miembros.sql`.
+2. Ve a **SQL Editor** y ejecuta, en este orden, `supabase/schema.sql`, `supabase/02_tareas_y_miembros.sql` y `supabase/03_avisos_horas_documentos.sql`.
    Esto crea las tablas, el bucket `documentos` y las reglas de seguridad (RLS).
 3. En **Project Settings → API** copia la *Project URL* y la clave *anon / publishable*.
 4. (Opcional) En **Authentication → Sign In / Providers** puedes desactivar "Confirm email" para pruebas, o desactivar el registro público si solo vas a dar de alta usuarios tú.

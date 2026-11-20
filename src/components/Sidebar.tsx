@@ -4,11 +4,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { CalendarDays, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
+import { BarChart3, Bell, CalendarDays, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/tareas", label: "Tareas", icon: ListChecks },
+  { href: "/horas", label: "Horas", icon: Clock },
+  { href: "/avisos", label: "Avisos", icon: Bell },
   { href: "/noticias", label: "Noticias", icon: Megaphone },
   { href: "/directorio", label: "Directorio de Equipo", icon: Users },
   { href: "/calendario", label: "Calendario", icon: CalendarDays },
@@ -16,9 +18,12 @@ const links = [
   { href: "/documentos", label: "Documentos", icon: FileText },
   { href: "/perfil", label: "Mi perfil", icon: User },
 ];
+const panelLink = { href: "/panel", label: "Panel de supervisión", icon: BarChart3 };
 const adminLink = { href: "/admin", label: "Administración", icon: Shield };
 
-export default function Sidebar({ name, role, isAdmin }: { name: string; role: string; isAdmin: boolean }) {
+export default function Sidebar({
+  name, role, isAdmin, isManager, unread,
+}: { name: string; role: string; isAdmin: boolean; isManager: boolean; unread: number }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -26,9 +31,15 @@ export default function Sidebar({ name, role, isAdmin }: { name: string; role: s
     <>
       <header className="flex items-center justify-between border-b-2 border-brand-600 bg-black px-4 py-2 text-white md:hidden">
         <img src="/logo-eco-motors.png" alt="Eco Motors" className="h-8 w-auto" />
+        <div className="flex items-center gap-4">
+        <Link href="/avisos" aria-label="Avisos" className="relative">
+          <Bell className="h-6 w-6" />
+          {unread > 0 && <span className="absolute -right-1.5 -top-1.5 rounded-full bg-brand-600 px-1.5 text-[10px] font-bold">{unread}</span>}
+        </Link>
         <button onClick={() => setOpen(!open)} aria-label="Menú">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
+        </div>
       </header>
 
       <aside
@@ -40,7 +51,7 @@ export default function Sidebar({ name, role, isAdmin }: { name: string; role: s
         <div className="checkered mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
 
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {[...links, ...(isAdmin ? [adminLink] : [])].map(({ href, label, icon: Icon }) => {
+          {[...links, ...(isManager ? [panelLink] : []), ...(isAdmin ? [adminLink] : [])].map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
@@ -54,6 +65,11 @@ export default function Sidebar({ name, role, isAdmin }: { name: string; role: s
                 }`}
               >
                 <Icon className="h-5 w-5" /> {label}
+                {href === "/avisos" && unread > 0 && (
+                  <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-bold ${active ? "bg-white text-brand-600" : "bg-brand-600 text-white"}`}>
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                )}
               </Link>
             );
           })}

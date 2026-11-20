@@ -13,8 +13,9 @@ import { upcomingEvents } from "@/lib/events";
 import { requireMe } from "@/lib/me";
 import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: PageProps<"/">) {
   await connection();
+  const pwOk = (await searchParams).pw === "ok";
   const { supabase, member, profile } = await requireMe();
 
   const [news, people, events, myTasks, projects] = await Promise.all([
@@ -35,6 +36,7 @@ export default async function HomePage() {
   return (
     <>
       <PageHeader icon={Home} title={`Hola, ${firstName} 👋`} subtitle={TEAM.slogan} />
+      {pwOk && <p className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">✅ Tu contraseña se ha cambiado correctamente.</p>}
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Stat href="/tareas" icon={ListChecks} value={myTasks.data?.length ?? 0} label="Mis tareas abiertas" />

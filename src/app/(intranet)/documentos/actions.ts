@@ -15,7 +15,13 @@ export async function uploadDocument(formData: FormData) {
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type });
   if (error) throw new Error(error.message);
-  await supabase.from("documents").insert({ name: file.name, path, size: file.size });
+  const unit_id = String(formData.get("unit_id") ?? "") || null;
+  const categoria = String(formData.get("categoria") ?? "Otro");
+  const ins = await supabase.from("documents").insert({ name: file.name, path, size: file.size, unit_id, categoria });
+  if (ins.error) {
+    await supabase.storage.from(BUCKET).remove([path]);
+    throw new Error(ins.error.message);
+  }
   revalidatePath("/documentos");
 }
 

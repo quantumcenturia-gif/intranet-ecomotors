@@ -1,4 +1,4 @@
-import { Calendar, FolderOpen, Globe, ListChecks, Mail, Rocket } from "lucide-react";
+import { Calendar, Clock, FolderOpen, Globe, Mail, Rocket } from "lucide-react";
 
 export const TEAM = {
   name: "Eco Motors",
@@ -9,7 +9,7 @@ export const TEAM = {
 
 /** Edita esta lista con los accesos que más usa el equipo. */
 export const quickLinks = [
-  { label: "Mis tareas", href: "/tareas", icon: ListChecks },
+  { label: "Registrar horas", href: "/horas", icon: Clock },
   { label: "Calendario", href: "/calendario", icon: Calendar },
   { label: "Documentos", href: "/documentos", icon: FolderOpen },
   { label: "Proyectos", href: "/proyectos", icon: Rocket },

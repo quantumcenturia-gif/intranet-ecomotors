@@ -1,11 +1,22 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- logo estático */
-import { useActionState, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useActionState, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { login, signup } from "./actions";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
+  const linkError = useSearchParams().get("error") === "enlace";
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [state, action, pending] = useActionState(mode === "login" ? login : signup, undefined);
 
@@ -29,6 +40,14 @@ export default function LoginPage() {
           <Field label="Email" name="email" type="email" />
           <Field label="Contraseña" name="password" type="password" minLength={6} />
 
+          {mode === "login" && (
+            <Link href="/recuperar" className="-mt-2 block text-right text-xs text-neutral-500 hover:text-brand-600">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          )}
+          {linkError && !state && (
+            <p className="text-sm text-red-600">El enlace del correo no es válido o ha caducado. Pide uno nuevo.</p>
+          )}
           {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
           {state?.message && <p className="text-sm text-emerald-600">{state.message}</p>}
 
