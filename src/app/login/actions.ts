@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type AuthState = { error?: string; message?: string } | undefined;
+export type AuthState = { error?: string; message?: string; done?: boolean } | undefined;
 
 export async function login(_: AuthState, formData: FormData): Promise<AuthState> {
   const supabase = await createClient();
@@ -60,6 +60,10 @@ export async function setNewPassword(_: AuthState, formData: FormData): Promise<
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message.includes("different") ? "La nueva contraseña debe ser distinta de la anterior." : error.message };
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) await supabase.from("profiles").update({ must_change_password: false }).eq("id", user.id);
-  redirect("/?pw=ok");
+  if (user) {
+    const { error: flagError } = await supabase.from("profiles").update({ must_change_password: false }).eq("id", user.id);
+    if (flagError) return { error: `Contraseña cambiada, pero no se pudo actualizar tu perfil: ${flagError.message}` };
+  }
+  // El cliente hace una navegación completa: así no reutiliza la página anterior guardada en caché.
+  return { done: true };
 }
