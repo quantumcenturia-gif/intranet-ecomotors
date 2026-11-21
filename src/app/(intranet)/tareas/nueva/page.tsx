@@ -64,6 +64,7 @@ export default async function NuevaTareaPage({ searchParams }: PageProps<"/tarea
           members={members ?? []}
           projects={projects ?? []}
           canAssign={isManager}
+          defaultConvocatoria={!parent}
         />
 
         <button className={btnPrimary}>

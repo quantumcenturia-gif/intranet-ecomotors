@@ -14,8 +14,9 @@ import { requireMe } from "@/lib/me";
 import { TASK_SELECT, formatShortDate, type TaskRow } from "@/lib/tasks";
 import { unitPath } from "@/lib/units";
 import {
-  addComment, deleteEvidence, deleteTask, downloadEvidence, reviewTask, updateProgress, updateTask, uploadEvidence,
+  addComment, decideVolunteer, deleteEvidence, deleteTask, downloadEvidence, reviewTask, unvolunteer, updateProgress, updateTask, uploadEvidence, volunteer,
 } from "../actions";
+import { subtree } from "@/lib/units";
 
 type Person = { id: string; full_name: string; avatar_url: string | null } | null;
 
@@ -41,15 +42,23 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
     parentId = p.parent_id;
   }
 
-  const [{ data: subtasks }, { data: files }, { data: comments }, { data: members }, { data: projects }] = await Promise.all([
+  const [{ data: subtasks }, { data: files }, { data: comments }, { data: members }, { data: projects }, { data: vols }] = await Promise.all([
     supabase.from("tasks").select(TASK_SELECT).eq("parent_id", id).order("created_at").returns<TaskRow[]>(),
     supabase.from("task_files").select("id,name,path,size,created_at,uploaded_by").eq("task_id", id).order("created_at"),
     supabase.from("task_comments").select("id,body,created_at,author:members(full_name,avatar_url)").eq("task_id", id).order("created_at"),
     supabase.from("members").select("id,full_name,unit_id").neq("estado", "Miembro retirado").order("full_name"),
     supabase.from("projects").select("id,name").order("sort"),
+    supabase.from("task_volunteers").select("id,member_id,nota,estado,created_at,member:members(id,full_name,avatar_url,unit_id)").eq("task_id", id).order("created_at"),
   ]);
+  type Vol = { id: number; member_id: string; nota: string | null; estado: string; created_at: string; member: { id: string; full_name: string; avatar_url: string | null; unit_id: string } | null };
+  const volunteers = (vols ?? []) as unknown as Vol[];
 
   const canManage = manageable.has(task.unit_id);
+  const isCreator = !!member && member.id === task.created_by;
+  const openCall = task.convocatoria && !["Completada y validada", "Cancelada"].includes(task.estado);
+  const canVolunteer = openCall && !!member && subtree(units, task.unit_id).includes(member.unit_id);
+  const myVol = volunteers.find((v) => v.member_id === member?.id);
+  const unitLabel = new Map(units.map((u) => [u.id, u.name]));
   const isAssignee = !!member && member.id === task.assignee_id;
   const canWork = canManage || isAssignee;
   const estado = estadoVisible(task);
@@ -76,6 +85,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <Badge className={ESTADO_STYLES[estado]}>{estado}</Badge>
               <Badge className={`bg-neutral-100 ${PRIORIDAD_STYLES[task.prioridad]}`}>Prioridad {task.prioridad}</Badge>
               <Badge className="bg-neutral-100 text-neutral-600">{task.tipo}</Badge>
+              {task.convocatoria && <Badge className="bg-brand-600 text-white">📣 Convocatoria</Badge>}
             </div>
             <h1 className="text-2xl font-bold">{task.title}</h1>
             <p className="mt-1 text-sm text-neutral-500">{path}</p>
@@ -94,6 +104,67 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               </div>
             </div>
           </section>
+
+          {/* Convocatoria */}
+          {task.convocatoria && (
+            <section className={`${card} border-l-4 border-l-brand-600 p-6`}>
+              <h2 className="mb-1 flex items-center gap-2 font-semibold">📣 Convocatoria abierta a {unitLabel.get(task.unit_id)}</h2>
+              <p className="mb-4 text-sm text-neutral-600">
+                {openCall ? "Los integrantes de esta área pueden apuntarse. Quien la publicó elige a quién acepta; a cada persona aceptada se le crea su subtarea." : "Esta convocatoria está cerrada."}
+              </p>
+
+              {canVolunteer && !myVol && (
+                <form action={volunteer} className="flex flex-col gap-2 rounded-lg bg-brand-50 p-4 sm:flex-row">
+                  <input type="hidden" name="id" value={task.id} />
+                  <input name="nota" placeholder="Comentario opcional (p. ej. «Tengo experiencia en soldadura»)" className={inputCls} />
+                  <button className={`${btnPrimary} whitespace-nowrap`}>🙋 Yo lo voy a hacer</button>
+                </form>
+              )}
+              {myVol && (
+                <div className="flex flex-wrap items-center gap-3 rounded-lg bg-neutral-50 p-4 text-sm">
+                  {myVol.estado === "Pendiente" && <>Te apuntaste. Esperando la respuesta de quien publicó la tarea.
+                    <form action={unvolunteer}><input type="hidden" name="id" value={task.id} /><button className="text-brand-600 hover:underline">Retirarme</button></form></>}
+                  {myVol.estado === "Aceptado" && <>✅ Te aceptaron: tienes tu subtarea abajo, en «Subtareas».</>}
+                  {myVol.estado === "Rechazado" && <>No fuiste seleccionado/a esta vez.</>}
+                </div>
+              )}
+
+              {(canManage || isCreator) && (
+                <div className="mt-4">
+                  <h3 className="mb-2 text-sm font-semibold">Se apuntaron ({volunteers.length})</h3>
+                  {volunteers.length ? (
+                    <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+                      {volunteers.map((v) => (
+                        <li key={v.id} className="flex flex-wrap items-center gap-3 p-3">
+                          <Avatar name={v.member?.full_name ?? "?"} src={v.member?.avatar_url} size={32} />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium">{v.member?.full_name}</p>
+                            <p className="text-xs text-neutral-500">{unitLabel.get(v.member?.unit_id ?? "")}{v.nota ? ` · «${v.nota}»` : ""}</p>
+                          </div>
+                          {v.estado === "Pendiente" ? (
+                            <div className="flex gap-2">
+                              <form action={decideVolunteer}>
+                                <input type="hidden" name="id" value={task.id} /><input type="hidden" name="volunteer_id" value={v.id} /><input type="hidden" name="accept" value="1" />
+                                <button className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-700">Aceptar</button>
+                              </form>
+                              <form action={decideVolunteer}>
+                                <input type="hidden" name="id" value={task.id} /><input type="hidden" name="volunteer_id" value={v.id} /><input type="hidden" name="accept" value="0" />
+                                <button className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs hover:bg-neutral-50">Rechazar</button>
+                              </form>
+                            </div>
+                          ) : (
+                            <Badge className={v.estado === "Aceptado" ? "bg-emerald-100 text-emerald-700" : "bg-neutral-100 text-neutral-500"}>{v.estado}</Badge>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-neutral-500">Todavía nadie se ha apuntado. Te llegará un aviso 🔔 cuando alguien lo haga.</p>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Subtareas */}
           <section>

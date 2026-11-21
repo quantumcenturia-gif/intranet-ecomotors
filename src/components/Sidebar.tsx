@@ -12,7 +12,7 @@ const links = [
   { href: "/asistencia", label: "Asistencia", icon: ClipboardCheck },
   { href: "/horas", label: "Horas", icon: Clock },
   { href: "/avisos", label: "Avisos", icon: Bell },
-  { href: "/noticias", label: "Noticias", icon: Megaphone },
+  { href: "/noticias", label: "Comunicados", icon: Megaphone },
   { href: "/directorio", label: "Directorio de Equipo", icon: Users },
   { href: "/calendario", label: "Calendario", icon: CalendarDays },
   { href: "/proyectos", label: "Proyectos", icon: Rocket },

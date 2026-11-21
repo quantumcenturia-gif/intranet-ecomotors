@@ -17,13 +17,15 @@ export async function createTask(formData: FormData) {
   if (!member && !isAdmin) fail("Tu cuenta no está vinculada a una ficha de integrante.");
   const unit_id = str(formData, "unit_id") ?? member?.unit_id ?? fail("Elige una unidad.");
   const isManager = manageable.has(unit_id);
+  const convocatoria = isManager && formData.get("modo") === "convocatoria";
   const { data, error } = await supabase
     .from("tasks")
     .insert({
+      convocatoria,
       title: str(formData, "title") ?? fail("Escribe un título."),
       description: str(formData, "description"),
       unit_id,
-      assignee_id: isManager ? str(formData, "assignee_id") : member?.id,
+      assignee_id: convocatoria ? null : isManager ? str(formData, "assignee_id") : member?.id,
       parent_id: str(formData, "parent_id") ? Number(formData.get("parent_id")) : null,
       project_id: str(formData, "project_id"),
       tipo: isManager ? (str(formData, "tipo") ?? "Del encargado") : "Del integrante",
@@ -41,13 +43,15 @@ export async function createTask(formData: FormData) {
 export async function updateTask(formData: FormData) {
   const { supabase } = await requireMe();
   const id = Number(formData.get("id"));
+  const convocatoria = formData.get("modo") === "convocatoria";
   const { error } = await supabase
     .from("tasks")
     .update({
+      convocatoria,
       title: str(formData, "title") ?? fail("Escribe un título."),
       description: str(formData, "description"),
       unit_id: str(formData, "unit_id"),
-      assignee_id: str(formData, "assignee_id"),
+      assignee_id: convocatoria ? null : str(formData, "assignee_id"),
       project_id: str(formData, "project_id"),
       tipo: str(formData, "tipo"),
       prioridad: str(formData, "prioridad"),
@@ -144,4 +148,32 @@ export async function addComment(formData: FormData) {
   const { error } = await supabase.from("task_comments").insert({ task_id: id, body, author_id: member?.id });
   if (error) fail(error.message);
   revalidatePath(`/tareas/${id}`);
+}
+
+export async function volunteer(formData: FormData) {
+  const { supabase } = await requireMe();
+  const id = Number(formData.get("id"));
+  const { error } = await supabase.rpc("task_volunteer", { p_task: id, p_nota: str(formData, "nota") ?? "" });
+  if (error) fail(error.message);
+  revalidatePath(`/tareas/${id}`);
+  revalidatePath("/tareas");
+}
+
+export async function unvolunteer(formData: FormData) {
+  const { supabase } = await requireMe();
+  const id = Number(formData.get("id"));
+  const { error } = await supabase.rpc("task_unvolunteer", { p_task: id });
+  if (error) fail(error.message);
+  revalidatePath(`/tareas/${id}`);
+  revalidatePath("/tareas");
+}
+
+export async function decideVolunteer(formData: FormData) {
+  const { supabase } = await requireMe();
+  const { error } = await supabase.rpc("task_volunteer_decide", {
+    p_volunteer: Number(formData.get("volunteer_id")),
+    p_accept: formData.get("accept") === "1",
+  });
+  if (error) fail(error.message);
+  revalidatePath(`/tareas/${formData.get("id")}`);
 }
