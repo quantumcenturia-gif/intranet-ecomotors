@@ -14,6 +14,8 @@ export type Member = {
   birthday: string | null;
   avatar_url: string | null;
   bio: string | null;
+  drive_url?: string | null;
+  es_prueba?: boolean;
   especialidad?: string | null;
   ciclo?: number | null;
   profile_id: string | null;
@@ -26,17 +28,34 @@ export const getMe = cache(async () => {
   const current = await getCurrentUser();
   if (!current) return null;
   const { supabase, user, profile } = current;
-  const [{ data: member }, { data: units }] = await Promise.all([
-    supabase.from("members").select("*").eq("profile_id", user.id).maybeSingle<Member>(),
+  // La ficha y los permisos los decide la base de datos: así la «vista previa» de dirección
+  // muestra exactamente lo mismo que vería una persona de ese rol y área.
+  const [mm, adm, real, { data: units }] = await Promise.all([
+    supabase.rpc("my_member"),
+    supabase.rpc("is_admin"),
+    supabase.rpc("real_is_admin"),
     supabase.from("units").select("*").order("sort").returns<Unit[]>(),
   ]);
-  const isAdmin = profile?.role === "admin" || member?.rol === "Coordinador general";
-  const isManager = isAdmin || (!!member && MANAGER_ROLES.includes(member.rol));
+  let member = (mm.data && (mm.data as Member).id ? (mm.data as Member) : null) as Member | null;
+  let isAdmin = adm.error ? false : Boolean(adm.data);
+  let realAdmin = real.error ? false : Boolean(real.data);
+  if (mm.error) {
+    // Compatibilidad si aún no existen las funciones nuevas en la base de datos
+    const { data } = await supabase.from("members").select("*").eq("profile_id", user.id).maybeSingle<Member>();
+    member = data;
+    isAdmin = profile?.role === "admin" || member?.rol === "Coordinador general";
+    realAdmin = isAdmin;
+  }
   const allUnits = units ?? [];
+  const led = member ? allUnits.filter((u) => u.leader_id === member!.id).flatMap((u) => subtree(allUnits, u.id)) : [];
+  const isManager = isAdmin || (!!member && MANAGER_ROLES.includes(member.rol)) || led.length > 0;
   const manageable = new Set(
-    isAdmin ? allUnits.map((u) => u.id) : isManager && member ? subtree(allUnits, member.unit_id) : [],
+    isAdmin
+      ? allUnits.map((u) => u.id)
+      : [...(member && MANAGER_ROLES.includes(member.rol) ? subtree(allUnits, member.unit_id) : []), ...led],
   );
-  return { supabase, user, profile, member, units: allUnits, isAdmin, isManager, manageable };
+  const preview = !!member?.es_prueba;
+  return { supabase, user, profile, member, units: allUnits, isAdmin, isManager, manageable, realAdmin, preview };
 });
 
 export async function requireMe() {

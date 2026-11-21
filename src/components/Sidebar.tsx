@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, Bell, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
+import { BarChart3, Bell, Eye, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
@@ -22,10 +22,11 @@ const links = [
 const panelLink = { href: "/panel", label: "Panel de supervisión", icon: BarChart3 };
 const reportLink = { href: "/reportes", label: "Reportes", icon: FileBarChart };
 const adminLink = { href: "/admin", label: "Administración", icon: Shield };
+const previewLink = { href: "/vista-previa", label: "Ver como…", icon: Eye };
 
 export default function Sidebar({
-  name, role, isAdmin, isManager, unread,
-}: { name: string; role: string; isAdmin: boolean; isManager: boolean; unread: number }) {
+  name, role, isAdmin, isManager, realAdmin, unread,
+}: { name: string; role: string; isAdmin: boolean; isManager: boolean; realAdmin: boolean; unread: number }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -53,7 +54,7 @@ export default function Sidebar({
         <div className="checkered mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
 
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {[...links, ...(isManager ? [panelLink, reportLink] : []), ...(isAdmin ? [adminLink] : [])].map(({ href, label, icon: Icon }) => {
+          {[...links, ...(isManager ? [panelLink, reportLink] : []), ...(isAdmin ? [adminLink] : []), ...(realAdmin ? [previewLink] : [])].map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link

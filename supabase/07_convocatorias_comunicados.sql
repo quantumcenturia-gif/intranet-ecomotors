@@ -10,12 +10,107 @@
 
 alter table public.tasks add column if not exists convocatoria boolean not null default false;
 
+-- ---------- Vista previa por rol (solo dirección general) y enlaces de Drive ----------
+alter table public.members add column if not exists drive_url text;
+alter table public.units add column if not exists drive_url text;
+alter table public.members add column if not exists es_prueba boolean not null default false;
+
+create table if not exists public.admin_preview (
+  profile_id uuid primary key references public.profiles(id) on delete cascade,
+  member_id uuid not null references public.members(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.admin_preview enable row level security;
+drop policy if exists "ver mi vista previa" on public.admin_preview;
+create policy "ver mi vista previa" on public.admin_preview for select to authenticated using (profile_id = auth.uid());
+grant select on public.admin_preview to authenticated;
+revoke insert, update, delete on public.admin_preview from authenticated, anon;
+
+-- ¿Es coordinación de verdad? (ignora la vista previa)
+create or replace function public.real_is_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+      or exists (select 1 from public.members where profile_id = auth.uid() and rol = 'Coordinador general' and not es_prueba);
+$$;
+
+-- Mi ficha: la de la vista previa si está activa; si no, la real
+create or replace function public.my_member()
+returns public.members language plpgsql stable security definer set search_path = public as $$
+declare r public.members;
+begin
+  select m.* into r from public.admin_preview p join public.members m on m.id = p.member_id where p.profile_id = auth.uid();
+  if found then return r; end if;
+  select * into r from public.members where profile_id = auth.uid() and not es_prueba limit 1;
+  return r;
+end; $$;
+
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select case when exists (select 1 from public.admin_preview where profile_id = auth.uid())
+              then coalesce((public.my_member()).rol = 'Coordinador general', false)
+              else public.real_is_admin() end;
+$$;
+
+create or replace function public.can_manage_unit(u text)
+returns boolean language sql stable security definer set search_path = public as $$
+  select public.is_admin()
+    or exists (select 1 from public.members m where m.id = (public.my_member()).id
+               and m.rol in ('Supervisor/a','Encargado/a') and public.unit_in_subtree(u, m.unit_id))
+    or exists (select 1 from public.units x where x.leader_id = (public.my_member()).id
+               and public.unit_in_subtree(u, x.id));
+$$;
+
+create or replace function public.is_manager()
+returns boolean language sql stable security definer set search_path = public as $$
+  select public.is_admin()
+    or coalesce((public.my_member()).rol in ('Supervisor/a','Encargado/a'), false)
+    or exists (select 1 from public.units where leader_id = (public.my_member()).id);
+$$;
+
+-- El guardián de fichas usa el permiso real (si no, la vista previa no podría cambiarse)
+create or replace function public.members_guard()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if not public.real_is_admin() then
+    new.unit_id := old.unit_id; new.rol := old.rol; new.estado := old.estado;
+    new.condicion := old.condicion; new.email := old.email; new.profile_id := old.profile_id;
+    new.notion_id := old.notion_id; new.es_prueba := old.es_prueba;
+  end if;
+  return new;
+end; $$;
+
+create or replace function public.preview_start(p_rol text, p_unit text)
+returns void language plpgsql security definer set search_path = public as $$
+declare mid uuid;
+begin
+  if not public.real_is_admin() then raise exception 'Solo dirección general puede usar la vista previa'; end if;
+  if p_rol not in ('Supervisor/a','Encargado/a','Integrante') then raise exception 'Rol no válido'; end if;
+  if not exists (select 1 from public.units where id = p_unit) then raise exception 'Unidad no válida'; end if;
+  select member_id into mid from public.admin_preview where profile_id = auth.uid();
+  if mid is null then
+    insert into public.members (full_name, unit_id, rol, es_prueba)
+    values ('Vista previa · ' || p_rol, p_unit, p_rol, true) returning id into mid;
+    insert into public.admin_preview (profile_id, member_id) values (auth.uid(), mid);
+  else
+    update public.members set unit_id = p_unit, rol = p_rol, full_name = 'Vista previa · ' || p_rol where id = mid;
+  end if;
+end; $$;
+
+create or replace function public.preview_stop()
+returns void language plpgsql security definer set search_path = public as $$
+declare mid uuid;
+begin
+  delete from public.admin_preview where profile_id = auth.uid() returning member_id into mid;
+  if mid is not null then delete from public.members where id = mid and es_prueba; end if;
+end; $$;
+
+
 -- Visibilidad: lo anterior + convocatorias abiertas a mi área (o a un área superior)
 create or replace function public.can_see_task(t public.tasks)
 returns boolean language sql stable security definer set search_path = public as $$
   select public.can_manage_unit(t.unit_id)
       or exists (
-        select 1 from public.members m where m.profile_id = auth.uid()
+        select 1 from public.members m where m.id = (public.my_member()).id
           and (m.id = t.assignee_id or m.id = t.created_by or m.unit_id = t.unit_id
                or (t.convocatoria and public.unit_in_subtree(m.unit_id, t.unit_id)))
       )
@@ -25,7 +120,7 @@ returns boolean language sql stable security definer set search_path = public as
           union all
           select c.id, c.assignee_id, c.unit_id from public.tasks c join down on c.parent_id = down.id
         )
-        select 1 from down join public.members m on m.profile_id = auth.uid()
+        select 1 from down join public.members m on m.id = (public.my_member()).id
         where down.assignee_id = m.id or down.unit_id = m.unit_id or public.can_manage_unit(down.unit_id)
       );
 $$;
@@ -125,4 +220,5 @@ drop trigger if exists announcements_notify on public.announcements;
 create trigger announcements_notify after insert on public.announcements
   for each row execute function public.announcements_notify();
 
+grant execute on function public.preview_start(text, text), public.preview_stop() to authenticated;
 grant execute on all functions in schema public to authenticated;

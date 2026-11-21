@@ -22,7 +22,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
 
   const [news, people, events, myTasks, projects] = await Promise.all([
     supabase.from("announcements").select("id,title,body,created_at,image_url").order("created_at", { ascending: false }).limit(3),
-    supabase.from("members").select("id,full_name,birthday,avatar_url,estado").neq("estado", "Miembro retirado"),
+    supabase.from("members").select("id,full_name,birthday,avatar_url,estado").eq("es_prueba", false).neq("estado", "Miembro retirado"),
     upcomingEvents(supabase, 14),
     member
       ? supabase.from("tasks").select(TASK_SELECT).eq("assignee_id", member.id)

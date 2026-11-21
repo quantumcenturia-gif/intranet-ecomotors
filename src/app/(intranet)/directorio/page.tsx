@@ -14,7 +14,7 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
   const selected = typeof area === "string" ? area : "";
   const { supabase, units } = await requireMe();
 
-  const { data } = await supabase.from("members").select("*").neq("estado", "Miembro retirado").order("full_name").returns<Member[]>();
+  const { data } = await supabase.from("members").select("*").eq("es_prueba", false).neq("estado", "Miembro retirado").order("full_name").returns<Member[]>();
   const all = data ?? [];
   const unitName = new Map(units.map((u) => [u.id, u.name]));
   const nq = normalizeName(query);

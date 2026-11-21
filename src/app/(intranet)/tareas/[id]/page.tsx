@@ -46,7 +46,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
     supabase.from("tasks").select(TASK_SELECT).eq("parent_id", id).order("created_at").returns<TaskRow[]>(),
     supabase.from("task_files").select("id,name,path,size,created_at,uploaded_by").eq("task_id", id).order("created_at"),
     supabase.from("task_comments").select("id,body,created_at,author:members(full_name,avatar_url)").eq("task_id", id).order("created_at"),
-    supabase.from("members").select("id,full_name,unit_id").neq("estado", "Miembro retirado").order("full_name"),
+    supabase.from("members").select("id,full_name,unit_id").eq("es_prueba", false).neq("estado", "Miembro retirado").order("full_name"),
     supabase.from("projects").select("id,name").order("sort"),
     supabase.from("task_volunteers").select("id,member_id,nota,estado,created_at,member:members(id,full_name,avatar_url,unit_id)").eq("task_id", id).order("created_at"),
   ]);
@@ -187,6 +187,21 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <h2 className="mb-4 flex items-center gap-2 font-semibold">
                 <Send className="h-5 w-5 text-brand-600" /> Mi entrega
               </h2>
+              {(member?.drive_url || units.find((u) => u.id === task.unit_id)?.drive_url) && (
+                <div className="mb-4 flex flex-wrap gap-2 rounded-lg bg-neutral-50 p-3 text-sm">
+                  <span className="w-full text-xs text-neutral-500">1) Sube tus archivos a Drive · 2) copia el enlace del archivo o carpeta y pégalo abajo · 3) envía a revisión</span>
+                  {member?.drive_url && (
+                    <a href={member.drive_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-black px-3 py-2 text-white hover:bg-neutral-800">
+                      📁 Subir a mi carpeta de Drive
+                    </a>
+                  )}
+                  {canManage && units.find((u) => u.id === task.unit_id)?.drive_url && (
+                    <a href={units.find((u) => u.id === task.unit_id)!.drive_url!} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-3 py-2 hover:bg-neutral-50">
+                      📂 Carpeta de {units.find((u) => u.id === task.unit_id)?.name}
+                    </a>
+                  )}
+                </div>
+              )}
               <form key={`p-${task.updated_at}`} action={updateProgress} className="grid gap-4 sm:grid-cols-2">
                 <input type="hidden" name="id" value={task.id} />
                 <Label label={`Avance (%)`}>
@@ -203,7 +218,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                     <option value="En revisión">En revisión (enviar al encargado)</option>
                   </select>
                 </Label>
-                <Label label="Enlace de entrega (Drive, etc.)" className="sm:col-span-2">
+                <Label label="Enlace del archivo o carpeta entregada (Drive)" className="sm:col-span-2">
                   <input type="url" name="entrega_url" defaultValue={task.entrega_url ?? ""} placeholder="https://drive.google.com/…" className={inputCls} />
                 </Label>
                 <Label label="Nota para el revisor" className="sm:col-span-2">

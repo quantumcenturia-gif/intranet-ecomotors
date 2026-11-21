@@ -17,12 +17,12 @@ export default async function SesionPage({ params }: PageProps<"/asistencia/[id]
   if (!canManage) redirect("/asistencia");
 
   const scope = s.unit_id ? subtree(units, s.unit_id) : null;
-  let mq = supabase.from("members").select("id,full_name,avatar_url,unit_id").neq("estado", "Miembro retirado").order("full_name");
+  let mq = supabase.from("members").select("id,full_name,avatar_url,unit_id").eq("es_prueba", false).neq("estado", "Miembro retirado").order("full_name");
   if (scope) mq = mq.in("unit_id", scope);
   const [{ data: members }, { data: records }, { data: people }] = await Promise.all([
     mq.returns<Pick<Member, "id" | "full_name" | "avatar_url" | "unit_id">[]>(),
     supabase.from("attendance_records").select("*").eq("session_id", id).returns<AttendanceRecord[]>(),
-    supabase.from("members").select("id,full_name").in("id", [s.opened_by, s.verified_by].filter(Boolean) as string[]),
+    supabase.from("members").select("id,full_name").eq("es_prueba", false).in("id", [s.opened_by, s.verified_by].filter(Boolean) as string[]),
   ]);
   const rec = new Map((records ?? []).map((r) => [r.member_id, r]));
   const name = new Map((people ?? []).map((p) => [p.id, p.full_name]));

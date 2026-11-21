@@ -37,7 +37,7 @@ export default async function ReportesPage({ searchParams }: PageProps<"/reporte
 
   const [r, { data: allMembers }] = await Promise.all([
     buildReport(p),
-    supabase.from("members").select("id,full_name,unit_id").neq("estado", "Miembro retirado").order("full_name"),
+    supabase.from("members").select("id,full_name,unit_id").eq("es_prueba", false).neq("estado", "Miembro retirado").order("full_name"),
   ]);
   const members = (allMembers ?? []).filter((m) => isAdmin || manageable.has(m.unit_id));
   const tree = flattenTree(units, isAdmin ? undefined : manageable).filter(({ unit }) => unit.id !== "por-asignar" || isAdmin);

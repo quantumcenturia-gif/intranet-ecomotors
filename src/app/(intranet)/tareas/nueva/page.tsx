@@ -12,7 +12,7 @@ export default async function NuevaTareaPage({ searchParams }: PageProps<"/tarea
   const { supabase, member, units, manageable, isManager } = await requireMe();
 
   const [{ data: members }, { data: projects }, { data: parent }, { data: openTasks }] = await Promise.all([
-    supabase.from("members").select("id,full_name,unit_id").neq("estado", "Miembro retirado").order("full_name"),
+    supabase.from("members").select("id,full_name,unit_id").eq("es_prueba", false).neq("estado", "Miembro retirado").order("full_name"),
     supabase.from("projects").select("id,name").order("sort"),
     parentId
       ? supabase.from("tasks").select("id,title,unit_id,project_id").eq("id", parentId).maybeSingle()
