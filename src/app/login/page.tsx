@@ -3,9 +3,9 @@
 /* eslint-disable @next/next/no-img-element -- logo estático */
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useActionState, useState } from "react";
+import { Suspense, useActionState } from "react";
 import { Loader2 } from "lucide-react";
-import { login, signup } from "./actions";
+import { login } from "./actions";
 
 export default function LoginPage() {
   return (
@@ -17,8 +17,7 @@ export default function LoginPage() {
 
 function LoginForm() {
   const linkError = useSearchParams().get("error") === "enlace";
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [state, action, pending] = useActionState(mode === "login" ? login : signup, undefined);
+  const [state, action, pending] = useActionState(login, undefined);
 
   return (
     <main className="racing-stripes relative flex min-h-screen items-center justify-center overflow-hidden bg-black p-4">
@@ -29,18 +28,15 @@ function LoginForm() {
         <div className="mb-6 text-center">
           <h1 className="text-xl font-bold">Intranet</h1>
           <p className="text-sm text-neutral-500">
-            {mode === "login" ? "Inicia sesión con tu cuenta" : "Crea tu cuenta de integrante"}
+            Inicia sesión con tu correo
           </p>
         </div>
 
         <form action={action} className="space-y-4">
-          {mode === "signup" && (
-            <Field label="Nombre completo" name="full_name" type="text" />
-          )}
           <Field label="Email" name="email" type="email" />
           <Field label="Contraseña" name="password" type="password" minLength={6} />
 
-          {mode === "login" && (
+          {(
             <Link href="/recuperar" className="-mt-2 block text-right text-xs text-neutral-500 hover:text-brand-600">
               ¿Olvidaste tu contraseña?
             </Link>
@@ -56,16 +52,13 @@ function LoginForm() {
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 py-2.5 font-medium text-white hover:bg-brand-700 disabled:opacity-60"
           >
             {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-            {mode === "login" ? "Entrar" : "Registrarse"}
+            Entrar
           </button>
         </form>
 
-        <button
-          onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          className="mt-4 w-full text-center text-sm text-brand-600 hover:underline"
-        >
-          {mode === "login" ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
-        </button>
+        <p className="mt-4 text-center text-xs text-neutral-500">
+          ¿No tienes cuenta? Pídesela a coordinación.
+        </p>
         </div>
         <p className="mt-6 text-center text-xs uppercase tracking-widest text-neutral-400">
           Más que un equipo, una pasión por la innovación
