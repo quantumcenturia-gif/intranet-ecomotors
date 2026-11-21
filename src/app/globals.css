@@ -31,3 +31,16 @@ body {
 .racing-stripes {
   background-image: linear-gradient(115deg, transparent 0 68%, #d90416 68% 74%, transparent 74% 77%, #d90416 77% 80%, transparent 80%);
 }
+
+/* Impresión de reportes */
+@media print {
+  @page { margin: 12mm; }
+  body { background: #fff; }
+  .print-exact { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  article table { min-width: 0 !important; font-size: 10px; }
+  article table td, article table th { padding-left: 4px !important; padding-right: 4px !important; }
+  article .overflow-x-auto { overflow: visible; }
+  article h1 { font-size: 18px !important; line-height: 1.25 !important; }
+  article section { break-inside: auto; }
+  article tr { break-inside: avoid; }
+}

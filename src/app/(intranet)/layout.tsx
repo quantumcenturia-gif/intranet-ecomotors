@@ -30,7 +30,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
         isManager={isManager}
         unread={unread ?? 0}
       />
-      <main className="min-w-0 flex-1 p-4 md:p-8">
+      <main className="min-w-0 flex-1 p-4 md:p-8 print:p-0">
         <div className="mx-auto max-w-5xl">
           <Suspense fallback={<Loading />}>{children}</Suspense>
         </div>

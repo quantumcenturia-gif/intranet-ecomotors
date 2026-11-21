@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, Bell, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
+import { BarChart3, Bell, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
@@ -20,6 +20,7 @@ const links = [
   { href: "/perfil", label: "Mi perfil", icon: User },
 ];
 const panelLink = { href: "/panel", label: "Panel de supervisión", icon: BarChart3 };
+const reportLink = { href: "/reportes", label: "Reportes", icon: FileBarChart };
 const adminLink = { href: "/admin", label: "Administración", icon: Shield };
 
 export default function Sidebar({
@@ -30,7 +31,7 @@ export default function Sidebar({
 
   return (
     <>
-      <header className="flex items-center justify-between border-b-2 border-brand-600 bg-black px-4 py-2 text-white md:hidden">
+      <header className="flex items-center justify-between print:hidden border-b-2 border-brand-600 bg-black px-4 py-2 text-white md:hidden">
         <img src="/logo-eco-motors.png" alt="Eco Motors" className="h-8 w-auto" />
         <div className="flex items-center gap-4">
         <Link href="/avisos" aria-label="Avisos" className="relative">
@@ -44,7 +45,7 @@ export default function Sidebar({
       </header>
 
       <aside
-        className={`${open ? "flex" : "hidden"} flex-col bg-black text-white md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0`}
+        className={`${open ? "flex" : "hidden"} print:!hidden flex-col bg-black text-white md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0`}
       >
         <div className="hidden px-6 pt-7 pb-5 md:block">
           <img src="/logo-eco-motors.png" alt="Eco Motors" className="w-full" />
@@ -52,7 +53,7 @@ export default function Sidebar({
         <div className="checkered mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
 
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {[...links, ...(isManager ? [panelLink] : []), ...(isAdmin ? [adminLink] : [])].map(({ href, label, icon: Icon }) => {
+          {[...links, ...(isManager ? [panelLink, reportLink] : []), ...(isAdmin ? [adminLink] : [])].map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
