@@ -6,9 +6,13 @@ import { ROLE_STYLES } from "@/data/eco-motors";
 import { requireMe } from "@/lib/me";
 import { unitPath } from "@/lib/units";
 import { updateProfile } from "./actions";
+import AttendanceHistory, { HISTORY_SELECT, type HistoryRow } from "@/components/attendance/AttendanceHistory";
 
 export default async function PerfilPage() {
-  const { user, profile, member, units } = await requireMe();
+  const { supabase, user, profile, member, units } = await requireMe();
+  const { data: history } = member
+    ? await supabase.from("attendance_records").select(HISTORY_SELECT).eq("member_id", member.id).order("id", { ascending: false }).limit(200).returns<HistoryRow[]>()
+    : { data: [] as HistoryRow[] };
   const name = member?.full_name ?? profile?.full_name ?? "";
 
   return (
@@ -48,6 +52,11 @@ export default async function PerfilPage() {
         )}
         <button className={btnPrimary}><Save className="h-4 w-4" /> Guardar</button>
       </form>
+      {member && (
+        <div className="mt-6">
+          <AttendanceHistory rows={history ?? []} />
+        </div>
+      )}
     </>
   );
 }

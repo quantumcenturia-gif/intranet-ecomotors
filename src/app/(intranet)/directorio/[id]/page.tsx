@@ -8,10 +8,11 @@ import { ROLE_STYLES } from "@/data/eco-motors";
 import { requireMe, type Member } from "@/lib/me";
 import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
 import { unitPath } from "@/lib/units";
+import AttendanceHistory, { HISTORY_SELECT, type HistoryRow } from "@/components/attendance/AttendanceHistory";
 
 export default async function MiembroPage({ params }: PageProps<"/directorio/[id]">) {
   const { id } = await params;
-  const { supabase, units } = await requireMe();
+  const { supabase, units, member: me, manageable } = await requireMe();
   const { data: m } = await supabase.from("members").select("*").eq("id", id).maybeSingle<Member>();
   if (!m) notFound();
   const { data: tasks } = await supabase
@@ -21,6 +22,11 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
     .not("estado", "in", "(Completada y validada,Cancelada)")
     .order("fecha_limite", { ascending: true, nullsFirst: false })
     .returns<TaskRow[]>();
+
+  const canSeeAttendance = me?.id === m.id || manageable.has(m.unit_id);
+  const { data: history } = canSeeAttendance
+    ? await supabase.from("attendance_records").select(HISTORY_SELECT).eq("member_id", m.id).order("id", { ascending: false }).limit(200).returns<HistoryRow[]>()
+    : { data: [] as HistoryRow[] };
 
   return (
     <>
@@ -56,6 +62,13 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
         </div>
         {m.bio && <p className="border-t border-neutral-100 px-6 py-4 text-neutral-700">{m.bio}</p>}
       </section>
+
+      {canSeeAttendance && (
+        <div className="mb-6">
+          <AttendanceHistory rows={history ?? []} title={me?.id === m.id ? "Mi asistencia" : "Asistencia y horas semanales"} />
+          <p className="mt-1 text-xs text-neutral-400">Solo visible para la persona y sus responsables.</p>
+        </div>
+      )}
 
       <h2 className="mb-3 font-semibold">Tareas abiertas</h2>
       <TaskList tasks={tasks ?? []} empty="No tiene tareas abiertas visibles para ti." />
