@@ -29,11 +29,11 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
       </Link>
       <section className={`${card} mb-6 overflow-hidden`}>
         <div className="racing-stripes h-24 bg-black" />
-        <div className="-mt-12 flex flex-col items-center gap-4 p-6 sm:flex-row sm:items-end">
-          <div className="rounded-full ring-4 ring-white">
+        <div className="flex flex-col items-center gap-4 px-6 pb-6 sm:flex-row sm:items-start">
+          <div className="-mt-12 shrink-0 rounded-full ring-4 ring-white">
             <Avatar name={m.full_name} src={m.avatar_url} size={104} />
           </div>
-          <div className="flex-1 text-center sm:text-left">
+          <div className="flex-1 text-center sm:pt-4 sm:text-left">
             <h1 className="text-2xl font-bold">{m.full_name}</h1>
             <p className="text-sm text-neutral-500">{unitPath(units, m.unit_id).map((u) => u.name).join(" › ")}</p>
             {m.especialidad && (
@@ -46,7 +46,7 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
               {m.estado !== "Activo" && <Badge className="bg-neutral-100">{m.estado}</Badge>}
             </div>
           </div>
-          <div className="flex flex-col gap-1 text-sm text-neutral-600">
+          <div className="flex flex-col gap-1 text-sm text-neutral-600 sm:pt-4">
             {m.email && <a href={`mailto:${m.email}`} className="flex items-center gap-2 hover:text-brand-600"><Mail className="h-4 w-4" /> {m.email}</a>}
             {m.phone && <a href={`tel:${m.phone}`} className="flex items-center gap-2 hover:text-brand-600"><Phone className="h-4 w-4" /> {m.phone}</a>}
             {m.birthday && (
