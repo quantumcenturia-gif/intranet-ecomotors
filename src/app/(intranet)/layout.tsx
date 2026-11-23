@@ -17,7 +17,7 @@ export default function IntranetLayout({ children }: LayoutProps<"/">) {
 async function Shell({ children }: { children: React.ReactNode }) {
   const me = await getMe();
   if (!me) redirect("/login");
-  const { supabase, user, profile, member, isAdmin, isManager, realAdmin, preview, units } = me;
+  const { supabase, user, profile, member, isAdmin, isManager, realAdmin, preview, units, manageable } = me;
   if (profile?.must_change_password && !preview) redirect("/nueva-contrasena?primera=1");
   const { count: unread } = member
     ? await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("member_id", member.id).is("read_at", null)
@@ -40,6 +40,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
         isManager={isManager}
         realAdmin={realAdmin && !preview}
         unread={unread ?? 0}
+        pilots={member?.unit_id === "pilotos" || manageable.has("pilotos")}
       />
       <main className="min-w-0 flex-1 p-4 md:p-8 print:p-0">
         <div className="mx-auto max-w-5xl">

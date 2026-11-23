@@ -8,7 +8,7 @@ import { ROLE_STYLES } from "@/data/eco-motors";
 import { requireMe, type Member } from "@/lib/me";
 import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
 import { unitPath } from "@/lib/units";
-import AttendanceHistory, { HISTORY_SELECT, type HistoryRow } from "@/components/attendance/AttendanceHistory";
+import MemberDashboard from "@/components/member/MemberDashboard";
 
 export default async function MiembroPage({ params }: PageProps<"/directorio/[id]">) {
   const { id } = await params;
@@ -24,9 +24,6 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
     .returns<TaskRow[]>();
 
   const canSeeAttendance = me?.id === m.id || manageable.has(m.unit_id);
-  const { data: history } = canSeeAttendance
-    ? await supabase.from("attendance_records").select(HISTORY_SELECT).eq("member_id", m.id).order("id", { ascending: false }).limit(200).returns<HistoryRow[]>()
-    : { data: [] as HistoryRow[] };
 
   return (
     <>
@@ -36,7 +33,7 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
       <section className={`${card} mb-6 overflow-hidden`}>
         <div className="racing-stripes h-24 bg-black" />
         <div className="flex flex-col items-center gap-4 px-6 pb-6 sm:flex-row sm:items-start">
-          <div className="-mt-12 shrink-0 rounded-full ring-4 ring-white">
+          <div className="-mt-12 shrink-0 animate-pop-in rounded-full ring-4 ring-white">
             <Avatar name={m.full_name} src={m.avatar_url} size={104} />
           </div>
           <div className="flex-1 text-center sm:pt-4 sm:text-left">
@@ -64,15 +61,17 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
         {m.bio && <p className="border-t border-neutral-100 px-6 py-4 text-neutral-700">{m.bio}</p>}
       </section>
 
-      {canSeeAttendance && (
-        <div className="mb-6">
-          <AttendanceHistory rows={history ?? []} title={me?.id === m.id ? "Mi asistencia" : "Asistencia y horas semanales"} />
-          <p className="mt-1 text-xs text-neutral-400">Solo visible para la persona y sus responsables.</p>
-        </div>
+      {canSeeAttendance ? (
+        <>
+          <MemberDashboard supabase={supabase} m={m} units={units} isSelf={me?.id === m.id} />
+          <p className="mt-2 text-xs text-neutral-400">El avance, la asistencia y las horas solo los ven la persona y sus responsables.</p>
+        </>
+      ) : (
+        <>
+          <h2 className="mb-3 font-semibold">Tareas abiertas</h2>
+          <TaskList tasks={tasks ?? []} empty="No tiene tareas abiertas visibles para ti." />
+        </>
       )}
-
-      <h2 className="mb-3 font-semibold">Tareas abiertas</h2>
-      <TaskList tasks={tasks ?? []} empty="No tiene tareas abiertas visibles para ti." />
     </>
   );
 }

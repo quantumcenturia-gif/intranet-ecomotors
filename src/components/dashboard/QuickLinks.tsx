@@ -14,9 +14,9 @@ export default function QuickLinks() {
             href={href}
             target={href.startsWith("http") ? "_blank" : undefined}
             rel="noreferrer"
-            className="flex flex-col items-center gap-2 rounded-lg border border-neutral-100 p-3 text-center text-sm text-neutral-700 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
+            className="group flex flex-col items-center gap-2 rounded-lg border border-neutral-100 p-3 text-center text-sm text-neutral-700 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700"
           >
-            <Icon className="h-5 w-5" /> {label}
+            <Icon className="h-5 w-5 transition duration-300 group-hover:-translate-y-1 group-hover:scale-110" /> {label}
           </a>
         ))}
       </div>

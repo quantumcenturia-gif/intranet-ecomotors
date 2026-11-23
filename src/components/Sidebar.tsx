@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, Bell, Eye, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
+import { BarChart3, Bell, Eye, Timer, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
@@ -23,10 +23,11 @@ const panelLink = { href: "/panel", label: "Panel de supervisión", icon: BarCha
 const reportLink = { href: "/reportes", label: "Reportes", icon: FileBarChart };
 const adminLink = { href: "/admin", label: "Administración", icon: Shield };
 const previewLink = { href: "/vista-previa", label: "Ver como…", icon: Eye };
+const pilotsLink = { href: "/pilotos", label: "Pilotos", icon: Timer };
 
 export default function Sidebar({
-  name, role, isAdmin, isManager, realAdmin, unread,
-}: { name: string; role: string; isAdmin: boolean; isManager: boolean; realAdmin: boolean; unread: number }) {
+  name, role, isAdmin, isManager, realAdmin, unread, pilots = false,
+}: { name: string; role: string; isAdmin: boolean; isManager: boolean; realAdmin: boolean; unread: number; pilots?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -36,7 +37,7 @@ export default function Sidebar({
         <img src="/logo-eco-motors.png" alt="Eco Motors" className="h-8 w-auto" />
         <div className="flex items-center gap-4">
         <Link href="/avisos" aria-label="Avisos" className="relative">
-          <Bell className="h-6 w-6" />
+          <Bell className={`h-6 w-6 origin-top ${unread > 0 ? "animate-ring" : ""}`} />
           {unread > 0 && <span className="absolute -right-1.5 -top-1.5 rounded-full bg-brand-600 px-1.5 text-[10px] font-bold">{unread}</span>}
         </Link>
         <button onClick={() => setOpen(!open)} aria-label="Menú">
@@ -51,23 +52,23 @@ export default function Sidebar({
         <div className="hidden px-6 pt-7 pb-5 md:block">
           <img src="/logo-eco-motors.png" alt="Eco Motors" className="w-full" />
         </div>
-        <div className="checkered mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
+        <div className="checkered animate-flag mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
 
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {[...links, ...(isManager ? [panelLink, reportLink] : []), ...(isAdmin ? [adminLink] : []), ...(realAdmin ? [previewLink] : [])].map(({ href, label, icon: Icon }) => {
+          {[...links.slice(0, 2), ...(pilots ? [pilotsLink] : []), ...links.slice(2), ...(isManager ? [panelLink, reportLink] : []), ...(isAdmin ? [adminLink] : []), ...(realAdmin ? [previewLink] : [])].map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
                   active
                     ? "bg-brand-600 text-white shadow-lg shadow-brand-900/40"
                     : "text-neutral-300 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <Icon className="h-5 w-5" /> {label}
+                <Icon className={`h-5 w-5 ${href === "/avisos" && unread > 0 ? "origin-top animate-ring" : "group-hover:animate-wiggle"}`} /> {label}
                 {href === "/avisos" && unread > 0 && (
                   <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-bold ${active ? "bg-white text-brand-600" : "bg-brand-600 text-white"}`}>
                     {unread > 99 ? "99+" : unread}
