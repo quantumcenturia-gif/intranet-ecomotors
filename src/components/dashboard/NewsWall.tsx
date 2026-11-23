@@ -10,7 +10,7 @@ export default function NewsWall({ news }: { news: News[] }) {
     <section className="rounded-xl border border-neutral-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-semibold">
-          <Megaphone className="h-5 w-5 text-brand-600" /> Noticias y anuncios
+          <Megaphone className="h-5 w-5 text-brand-600" /> Comunicados
         </h2>
         <Link href="/noticias" className="flex items-center gap-1 text-sm text-brand-600 hover:underline">
           Ver todas <ArrowRight className="h-4 w-4" />
@@ -30,7 +30,7 @@ export default function NewsWall({ news }: { news: News[] }) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-neutral-500">Todavía no hay anuncios.</p>
+        <p className="text-sm text-neutral-500">Todavía no hay comunicados.</p>
       )}
     </section>
   );

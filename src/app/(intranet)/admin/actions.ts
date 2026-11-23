@@ -2,12 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireMe } from "@/lib/me";
+import { requireWriter } from "@/lib/me";
 import { importFromNotion } from "@/lib/notion-import";
+import { failBack } from "@/lib/action-error";
 
 async function admin() {
-  const me = await requireMe();
-  if (!me.isAdmin) throw new Error("Solo coordinación puede hacer esto.");
+  const me = await requireWriter();
+  if (!me.isAdmin) await failBack("Solo coordinación puede hacer esto.");
   return me;
 }
 const s = (f: FormData, k: string) => String(f.get(k) ?? "").trim() || null;
@@ -33,7 +34,7 @@ export async function saveMember(formData: FormData) {
   const { error } = id
     ? await supabase.from("members").update(row).eq("id", id)
     : await supabase.from("members").insert(row);
-  if (error) throw new Error(error.message.includes("members_email_key") ? "Ese correo ya está en otra ficha." : error.message);
+  if (error) await failBack(error.message.includes("members_email_key") ? "Ese correo ya está en otra ficha." : error.message);
   revalidatePath("/admin");
   revalidatePath("/directorio");
 }

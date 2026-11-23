@@ -56,7 +56,7 @@ export async function buildReport(p: ReportParams) {
   const unitName = new Map(units.map((u) => [u.id, u.name]));
 
   // 1) Miembros del alcance (limitado a lo que el usuario gestiona)
-  let mq = supabase.from("members").select("id,full_name,unit_id,rol,email,especialidad,ciclo,estado").neq("estado", "Miembro retirado").order("full_name");
+  let mq = supabase.from("members").select("id,full_name,unit_id,rol,email,especialidad,ciclo,estado").eq("es_prueba", false).neq("estado", "Miembro retirado").order("full_name");
   let scopeLabel = "Todo el equipo";
   if (p.scope === "integrante") {
     mq = mq.eq("id", p.member || "00000000-0000-0000-0000-000000000000");

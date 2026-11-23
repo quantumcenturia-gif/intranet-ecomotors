@@ -12,13 +12,15 @@ export default function TaskFields({
   members,
   projects,
   canAssign,
+  defaultConvocatoria = false,
 }: {
-  task?: Partial<Task>;
+  task?: Partial<Task> & { convocatoria?: boolean };
   units: Unit[];
   manageable: Set<string>;
   members: Pick<Member, "id" | "full_name" | "unit_id">[];
   projects: { id: string; name: string }[];
   canAssign: boolean;
+  defaultConvocatoria?: boolean;
 }) {
   const tree = flattenTree(units, canAssign ? manageable : undefined);
   const byUnit = flattenTree(units)
@@ -36,18 +38,37 @@ export default function TaskFields({
 
       {canAssign && (
         <>
-          <Label label="Unidad">
+          <fieldset className="sm:col-span-2">
+            <legend className="mb-2 block text-xs font-medium uppercase tracking-wide text-neutral-500">¿Cómo se publica?</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="flex cursor-pointer gap-3 rounded-lg border border-neutral-300 p-3 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50">
+                <input type="radio" name="modo" value="convocatoria" defaultChecked={task?.convocatoria ?? defaultConvocatoria} className="mt-1 accent-brand-600" />
+                <span>
+                  <span className="block text-sm font-semibold">📣 Convocatoria a un área o subárea</span>
+                  <span className="block text-xs text-neutral-500">Todos sus integrantes la ven y pulsan «Yo lo voy a hacer». Tú recibes un aviso y eliges a quién aceptas.</span>
+                </span>
+              </label>
+              <label className="flex cursor-pointer gap-3 rounded-lg border border-neutral-300 p-3 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50">
+                <input type="radio" name="modo" value="persona" defaultChecked={!(task?.convocatoria ?? defaultConvocatoria)} className="mt-1 accent-brand-600" />
+                <span>
+                  <span className="block text-sm font-semibold">👤 Asignar a una persona</span>
+                  <span className="block text-xs text-neutral-500">La tarea va directamente al responsable que elijas.</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+          <Label label="Para el área o subárea">
             <select name="unit_id" required defaultValue={task?.unit_id} className={inputCls}>
               {tree.map(({ unit, depth }) => (
                 <option key={unit.id} value={unit.id}>
-                  {"  ".repeat(depth)}{unit.name}
+                  {"\u00a0\u00a0".repeat(depth)}{unit.kind === "subarea" ? "" : "▸ "}{unit.name}
                 </option>
               ))}
             </select>
           </Label>
-          <Label label="Responsable">
+          <Label label="Responsable (si la asignas a una persona)">
             <select name="assignee_id" defaultValue={task?.assignee_id ?? ""} className={inputCls}>
-              <option value="">Sin asignar</option>
+              <option value="">— Nadie todavía —</option>
               {byUnit.map(({ unit, people }) => (
                 <optgroup key={unit.id} label={unit.name}>
                   {people.map((m) => (

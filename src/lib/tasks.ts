@@ -20,16 +20,18 @@ export type Task = {
   revisado_at: string | null;
   created_at: string;
   updated_at: string;
+  convocatoria: boolean;
 };
 
 export const TASK_SELECT =
-  "*, assignee:members!tasks_assignee_id_fkey(id,full_name,avatar_url), unit:units(id,name), project:projects(id,name), subtasks:tasks!parent_id(id,estado)";
+  "*, assignee:members!tasks_assignee_id_fkey(id,full_name,avatar_url), unit:units(id,name), project:projects(id,name), subtasks:tasks!parent_id(id,estado), volunteers:task_volunteers!task_id(id,estado)";
 
 export type TaskRow = Task & {
   assignee: { id: string; full_name: string; avatar_url: string | null } | null;
   unit: { id: string; name: string } | null;
   project: { id: string; name: string } | null;
   subtasks: { id: number; estado: string }[];
+  volunteers?: { id: number; estado: string }[];
 };
 
 export const formatShortDate = (d: string | null) =>

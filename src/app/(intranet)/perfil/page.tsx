@@ -29,6 +29,11 @@ export default async function PerfilPage() {
         </p>
       )}
 
+      {member?.drive_url && (
+        <a href={member.drive_url} target="_blank" rel="noreferrer" className="mb-4 inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-neutral-800">
+          📁 Mi carpeta de entregas en Drive
+        </a>
+      )}
       <form action={updateProfile} className={`${card} max-w-lg space-y-4 p-6`}>
         <div className="flex items-center gap-4">
           <Avatar name={name} src={member?.avatar_url} size={80} />

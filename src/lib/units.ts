@@ -1,4 +1,12 @@
-export type Unit = { id: string; name: string; kind: "area" | "supervision" | "subarea"; parent_id: string | null; sort: number };
+export type Unit = {
+  id: string;
+  name: string;
+  kind: "area" | "supervision" | "subarea";
+  parent_id: string | null;
+  sort: number;
+  leader_id?: string | null;
+  drive_url?: string | null;
+};
 
 /** Todas las unidades dentro de root (incluida). */
 export function subtree(units: Unit[], root: string): string[] {

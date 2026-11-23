@@ -54,6 +54,7 @@ export default async function MiembroPage({ params }: PageProps<"/directorio/[id
           </div>
           <div className="flex flex-col gap-1 text-sm text-neutral-600 sm:pt-4">
             {m.email && <a href={`mailto:${m.email}`} className="flex items-center gap-2 hover:text-brand-600"><Mail className="h-4 w-4" /> {m.email}</a>}
+            {canSeeAttendance && m.drive_url && <a href={m.drive_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-600">📁 Carpeta de entregas</a>}
             {m.phone && <a href={`tel:${m.phone}`} className="flex items-center gap-2 hover:text-brand-600"><Phone className="h-4 w-4" /> {m.phone}</a>}
             {m.birthday && (
               <span className="flex items-center gap-2"><Cake className="h-4 w-4" /> {new Date(m.birthday + "T12:00").toLocaleDateString("es-PE", { day: "numeric", month: "long" })}</span>

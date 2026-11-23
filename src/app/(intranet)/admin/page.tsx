@@ -20,7 +20,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
   const { supabase, units, isAdmin } = await requireMe();
   if (!isAdmin) redirect("/");
 
-  const { data } = await supabase.from("members").select("*").order("full_name").returns<Member[]>();
+  const { data } = await supabase.from("members").select("*").eq("es_prueba", false).order("full_name").returns<Member[]>();
   const nq = normalizeName(q);
   const members = (data ?? []).filter((m) => !nq || normalizeName(`${m.full_name} ${m.email ?? ""}`).includes(nq));
   const tree = flattenTree(units);

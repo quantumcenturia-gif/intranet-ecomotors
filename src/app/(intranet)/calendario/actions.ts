@@ -1,13 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireMe } from "@/lib/me";
+import { requireWriter } from "@/lib/me";
+import { failBack } from "@/lib/action-error";
 
 export async function createEvent(formData: FormData) {
-  const { supabase } = await requireMe();
+  const { supabase } = await requireWriter();
   const s = (k: string) => String(formData.get(k) ?? "").trim() || null;
   const date = s("date");
-  if (!date) throw new Error("Elige una fecha.");
+  if (!date) await failBack("Elige una fecha.");
   const start = s("start"), end = s("end");
   const { error } = await supabase.from("events").insert({
     title: s("title"),
@@ -19,14 +20,14 @@ export async function createEvent(formData: FormData) {
     dirigido_a: formData.getAll("dirigido_a").map(String),
     notas: s("notas"),
   });
-  if (error) throw new Error(error.message);
+  if (error) await failBack(error.message);
   revalidatePath("/calendario");
   revalidatePath("/");
 }
 
 export async function deleteEvent(formData: FormData) {
-  const { supabase } = await requireMe();
+  const { supabase } = await requireWriter();
   const { error } = await supabase.from("events").delete().eq("id", Number(formData.get("id")));
-  if (error) throw new Error(error.message);
+  if (error) await failBack(error.message);
   revalidatePath("/calendario");
 }

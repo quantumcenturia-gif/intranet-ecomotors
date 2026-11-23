@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { NOTION_SOURCES, notionEnabled, queryDataSource, select, text } from "@/lib/notion";
+import { failBack } from "@/lib/action-error";
 
 /** Subárea de Notion → unidad de la intranet. */
 const UNIT_FROM_NOTION: Record<string, string> = {
@@ -27,7 +28,7 @@ const limaDate = (d: string, allDay: boolean) => (allDay ? `${d}T00:00:00-05:00`
  * No toca correos, fotos ni datos que se hayan añadido en la intranet.
  */
 export async function importFromNotion(supabase: SupabaseClient) {
-  if (!notionEnabled()) throw new Error("Falta la variable NOTION_TOKEN.");
+  if (!notionEnabled()) await failBack("Falta la variable NOTION_TOKEN.");
 
   const people = await queryDataSource(NOTION_SOURCES.miembros);
   const members = people
@@ -41,7 +42,7 @@ export async function importFromNotion(supabase: SupabaseClient) {
     }))
     .filter((m) => m.full_name);
   const r1 = await supabase.from("members").upsert(members, { onConflict: "notion_id" });
-  if (r1.error) throw new Error(`Miembros: ${r1.error.message}`);
+  if (r1.error) await failBack(`Miembros: ${r1.error.message}`);
 
   const since = new Date(Date.now() - 60 * 86_400_000).toISOString().slice(0, 10);
   const pages = await queryDataSource(NOTION_SOURCES.calendario, {
@@ -66,7 +67,7 @@ export async function importFromNotion(supabase: SupabaseClient) {
       };
     });
   const r2 = await supabase.from("events").upsert(events, { onConflict: "notion_id" });
-  if (r2.error) throw new Error(`Calendario: ${r2.error.message}`);
+  if (r2.error) await failBack(`Calendario: ${r2.error.message}`);
 
   return { members: members.length, events: events.length };
 }
