@@ -8,6 +8,8 @@ import UpcomingEvents from "@/components/dashboard/UpcomingEvents";
 import QuickLinks from "@/components/dashboard/QuickLinks";
 import Projects from "@/components/dashboard/Projects";
 import TaskList from "@/components/tasks/TaskList";
+import PilotBanner from "@/components/pilots/PilotBanner";
+import { RUN_SELECT, type PilotRun } from "@/lib/pilots";
 import { TEAM } from "@/data/eco-motors";
 import { upcomingEvents } from "@/lib/events";
 import { requireMe } from "@/lib/me";
@@ -47,6 +49,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const { data: att } = !isAdmin && member
     ? await supabase.from("attendance_records").select("horas,session:attendance_sessions(fecha,estado)").eq("member_id", member.id).order("id", { ascending: false }).limit(40)
     : { data: [] };
+  // Los pilotos ven sus tiempos en el inicio
+  const isPilot = member?.unit_id === "pilotos";
+  const { data: pilotRuns } = isPilot
+    ? await supabase.from("pilot_runs").select(RUN_SELECT).eq("piloto_id", member!.id).order("fecha").order("intento").returns<PilotRun[]>()
+    : { data: [] as PilotRun[] };
   const week = weeklyHours(
     ((att ?? []) as unknown as { horas: number | null; session: { fecha: string; estado: string } | null }[])
       .filter((r) => r.session)
@@ -79,6 +86,8 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         )}
         <Stat href="/calendario" icon={CalendarDays} value={events.length} label="Actividades en 2 semanas" />
       </div>
+
+      {isPilot && member && <div className="mb-6"><PilotBanner memberId={member.id} runs={pilotRuns ?? []} isSelf /></div>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 [&>*]:min-w-0">
         <div className="space-y-6 lg:col-span-2">

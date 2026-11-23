@@ -1,15 +1,15 @@
 import Link from "next/link";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ArrowRight, CalendarCheck2, CheckCircle2, Clock, ListChecks, Target, Timer, Trophy } from "lucide-react";
+import { CalendarCheck2, CheckCircle2, Clock, ListChecks, Target } from "lucide-react";
 import AttendanceHistory, { HISTORY_SELECT, type HistoryRow } from "@/components/attendance/AttendanceHistory";
 import BarChart from "@/components/charts/BarChart";
-import TrendBadge from "@/components/pilots/TrendBadge";
+import PilotBanner from "@/components/pilots/PilotBanner";
 import TaskList from "@/components/tasks/TaskList";
 import { card } from "@/components/ui";
 import { estadoVisible } from "@/data/eco-motors";
 import { fmtHours, weeklyHours } from "@/lib/attendance";
 import type { Member } from "@/lib/me";
-import { RUN_SELECT, bestByDay, fmtLap, type PilotRun } from "@/lib/pilots";
+import { RUN_SELECT, type PilotRun } from "@/lib/pilots";
 import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
 import { subtree, type Unit } from "@/lib/units";
 
@@ -66,9 +66,6 @@ export default async function MemberDashboard({
     1,
   )[0];
 
-  const runs = runsData ?? [];
-  const pilotDays = bestByDay(runs);
-  const record = pilotDays.length ? Math.min(...pilotDays.map((d) => d.best)) : null;
 
   return (
     <div className="space-y-6">
@@ -99,19 +96,7 @@ export default async function MemberDashboard({
         </section>
       </div>
 
-      {isPilot && (
-        <Link href={`/pilotos/${m.id}`} className="group flex flex-wrap items-center gap-4 overflow-hidden rounded-xl bg-black p-5 text-white transition hover:shadow-lg">
-          <div className="checkered animate-flag h-12 w-3 rounded-sm" />
-          <Timer className="h-8 w-8 text-brand-500 group-hover:animate-wiggle" />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs uppercase tracking-wide text-neutral-400">{isSelf ? "Mis tiempos de piloto" : "Tiempos de piloto"}</p>
-            <p className="flex items-center gap-2 text-xl font-bold"><Trophy className="h-5 w-5 text-amber-400" /> Récord: {fmtLap(record)}</p>
-            <p className="text-sm text-neutral-400">{runs.length} intento{runs.length === 1 ? "" : "s"} registrados</p>
-          </div>
-          <div className="[&_span]:bg-white/10 [&_span]:text-white"><TrendBadge days={pilotDays} /></div>
-          <span className="flex items-center gap-1 text-sm font-medium text-brand-400">Ver curvas de avance <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
-        </Link>
-      )}
+      {isPilot && <PilotBanner memberId={m.id} runs={runsData ?? []} isSelf={isSelf} />}
 
       <AttendanceHistory rows={rows} title={isSelf ? "Mi asistencia" : "Asistencia y horas semanales"} />
     </div>
