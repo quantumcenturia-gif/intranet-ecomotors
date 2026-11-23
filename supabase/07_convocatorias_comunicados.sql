@@ -8,6 +8,13 @@
 -- Ejecútalo DESPUÉS de 06_asistencias.sql.
 -- =====================================================================
 
+-- Limpieza de pruebas automáticas (avisos de un comunicado de prueba)
+delete from public.notifications where body like 'ZZ %';
+-- Limpieza: avisos «Nueva tarea asignada» que generó la importación de tareas desde Notion
+delete from public.notifications n
+where n.title = 'Nueva tarea asignada' and n.created_at < '2026-11-24'
+  and exists (select 1 from public.tasks t where '/tareas/' || t.id = n.link and t.description like '%Importada desde Notion.%');
+
 alter table public.tasks add column if not exists convocatoria boolean not null default false;
 
 -- ---------- Vista previa por rol (solo dirección general) y enlaces de Drive ----------
