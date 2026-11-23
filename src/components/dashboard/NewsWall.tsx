@@ -2,15 +2,16 @@
 import Link from "next/link";
 import { ArrowRight, Megaphone } from "lucide-react";
 import { formatDate } from "@/lib/format";
+import AudienceBadge from "@/components/AudienceBadge";
 
-type News = { id: number; title: string; body: string; created_at: string; image_url?: string | null };
+type News = { id: number; title: string; body: string; created_at: string; image_url?: string | null; unit?: { name: string } | null };
 
 export default function NewsWall({ news }: { news: News[] }) {
   return (
     <section className="rounded-xl border border-neutral-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 font-semibold">
-          <Megaphone className="h-5 w-5 text-brand-600" /> Comunicados
+          <Megaphone className="h-5 w-5 origin-left text-brand-600 animate-wiggle-slow" /> Comunicados
         </h2>
         <Link href="/noticias" className="flex items-center gap-1 text-sm text-brand-600 hover:underline">
           Ver todas <ArrowRight className="h-4 w-4" />
@@ -24,7 +25,7 @@ export default function NewsWall({ news }: { news: News[] }) {
               <div className="min-w-0">
               <p className="font-medium">{n.title}</p>
               <p className="line-clamp-2 text-sm text-neutral-600">{n.body}</p>
-              <p className="mt-1 text-xs text-neutral-400">{formatDate(n.created_at)}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-neutral-400"><AudienceBadge name={n.unit?.name} /> {formatDate(n.created_at)}</p>
               </div>
             </li>
           ))}
