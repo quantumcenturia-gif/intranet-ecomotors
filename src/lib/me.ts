@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { subtree, type Unit } from "@/lib/units";
+import { failBack } from "@/lib/action-error";
 
 export type Member = {
   id: string;
@@ -61,5 +62,14 @@ export const getMe = cache(async () => {
 export async function requireMe() {
   const me = await getMe();
   if (!me) throw new Error("Sin sesión");
+  return me;
+}
+
+export const PREVIEW_READONLY = "Estás en la vista previa: aquí solo puedes mirar. Sal de la vista previa para hacer cambios.";
+
+/** Como requireMe, pero para acciones que guardan cambios: en la vista previa no se permite nada. */
+export async function requireWriter() {
+  const me = await requireMe();
+  if (me.preview) await failBack(PREVIEW_READONLY);
   return me;
 }

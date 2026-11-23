@@ -56,7 +56,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
   const canManage = manageable.has(task.unit_id);
   const isCreator = !!member && member.id === task.created_by;
   const openCall = task.convocatoria && !["Completada y validada", "Cancelada"].includes(task.estado);
-  const canVolunteer = openCall && !!member && subtree(units, task.unit_id).includes(member.unit_id);
+  const canVolunteer = openCall && !!member && !isCreator && subtree(units, task.unit_id).includes(member.unit_id);
   const myVol = volunteers.find((v) => v.member_id === member?.id);
   const unitLabel = new Map(units.map((u) => [u.id, u.name]));
   const isAssignee = !!member && member.id === task.assignee_id;
@@ -181,8 +181,8 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
             <TaskList tasks={subtasks ?? []} empty="Esta tarea no tiene subtareas." />
           </section>
 
-          {/* Entrega del responsable */}
-          {canWork && (
+          {/* Entrega del responsable (una convocatoria sin responsable avanza con sus subtareas) */}
+          {canWork && !(task.convocatoria && !task.assignee_id) && (
             <section className={`${card} p-6`}>
               <h2 className="mb-4 flex items-center gap-2 font-semibold">
                 <Send className="h-5 w-5 text-brand-600" /> Mi entrega

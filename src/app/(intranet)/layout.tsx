@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
+import ActionError from "@/components/ActionError";
 import { getMe } from "@/lib/me";
 import { stopPreview } from "./vista-previa/actions";
 
@@ -42,6 +43,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
       />
       <main className="min-w-0 flex-1 p-4 md:p-8 print:p-0">
         <div className="mx-auto max-w-5xl">
+          <Suspense fallback={null}><ActionError /></Suspense>
           <Suspense fallback={<Loading />}>{children}</Suspense>
         </div>
       </main>

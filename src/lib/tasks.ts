@@ -24,7 +24,7 @@ export type Task = {
 };
 
 export const TASK_SELECT =
-  "*, assignee:members!tasks_assignee_id_fkey(id,full_name,avatar_url), unit:units(id,name), project:projects(id,name), subtasks:tasks!parent_id(id,estado), volunteers:task_volunteers(id,estado)";
+  "*, assignee:members!tasks_assignee_id_fkey(id,full_name,avatar_url), unit:units(id,name), project:projects(id,name), subtasks:tasks!parent_id(id,estado), volunteers:task_volunteers!task_id(id,estado)";
 
 export type TaskRow = Task & {
   assignee: { id: string; full_name: string; avatar_url: string | null } | null;

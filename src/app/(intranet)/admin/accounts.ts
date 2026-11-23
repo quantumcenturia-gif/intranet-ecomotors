@@ -1,15 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireMe } from "@/lib/me";
+import { requireWriter } from "@/lib/me";
 import { generatePassword } from "@/lib/passwords";
+import { failBack } from "@/lib/action-error";
 
 export type AccountRow = { name: string; email: string; password: string | null; result: string };
 export type AccountsState = { rows: AccountRow[]; error?: string } | undefined;
 
 async function admin() {
-  const me = await requireMe();
-  if (!me.isAdmin) throw new Error("Solo coordinación puede hacer esto.");
+  const me = await requireWriter();
+  if (!me.isAdmin) await failBack("Solo coordinación puede hacer esto.");
   return me;
 }
 

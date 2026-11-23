@@ -33,7 +33,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   ]);
   const { data: convs } = await supabase
     .from("tasks")
-    .select("id,title,unit:units(name),volunteers:task_volunteers(member_id)")
+    .select("id,title,unit:units(name),volunteers:task_volunteers!task_id(member_id)")
     .eq("convocatoria", true)
     .not("estado", "in", "(Completada y validada,Cancelada)")
     .in("unit_id", branch)
