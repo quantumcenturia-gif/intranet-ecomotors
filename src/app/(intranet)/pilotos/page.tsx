@@ -113,6 +113,7 @@ export default async function PilotosPage({ searchParams }: PageProps<"/pilotos"
           x={days.map((d) => ({ key: d, label: dayShort(d) }))}
           series={series}
           format="lap"
+          legend
         />
       </section>
 
@@ -128,8 +129,8 @@ export default async function PilotosPage({ searchParams }: PageProps<"/pilotos"
                 {[...runs].reverse().slice(0, 20).map((r) => {
                   const st = runStats(r);
                   return (
-                    <tr key={r.id}>
-                      <td className="py-2 whitespace-nowrap">{dayShort(r.fecha)}</td>
+                    <tr key={r.id} className="[&>td]:py-2">
+                      <td className="whitespace-nowrap">{dayShort(r.fecha)}</td>
                       <td><Link href={`/pilotos/${r.piloto_id}`} className="hover:text-brand-600">{short(nameOf.get(r.piloto_id) ?? "—")}</Link></td>
                       <td>{r.project_id ? projectName.get(r.project_id) : "—"}</td>
                       <td>#{r.intento}</td>

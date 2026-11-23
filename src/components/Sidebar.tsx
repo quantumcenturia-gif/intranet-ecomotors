@@ -49,12 +49,12 @@ export default function Sidebar({
       <aside
         className={`${open ? "flex" : "hidden"} print:!hidden flex-col bg-black text-white md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0`}
       >
-        <div className="hidden px-6 pt-7 pb-5 md:block">
+        <div className="hidden shrink-0 px-6 pt-7 pb-5 md:block">
           <img src="/logo-eco-motors.png" alt="Eco Motors" className="w-full" />
         </div>
-        <div className="checkered animate-flag mx-5 hidden h-2 rounded-sm opacity-80 md:block" />
+        <div className="checkered animate-flag mx-5 hidden h-2 shrink-0 rounded-sm opacity-80 md:block" />
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-4">
           {[...links.slice(0, 2), ...(pilots ? [pilotsLink] : []), ...links.slice(2), ...(isManager ? [panelLink, reportLink] : []), ...(isAdmin ? [adminLink] : []), ...(realAdmin ? [previewLink] : [])].map(({ href, label, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
@@ -79,7 +79,7 @@ export default function Sidebar({
           })}
         </nav>
 
-        <div className="border-t border-white/10 p-4">
+        <div className="shrink-0 border-t border-white/10 p-4">
           <p className="truncate text-sm font-medium">{name}</p>
           <p className="mb-3 text-xs text-brand-400">{role}</p>
           <form action="/auth/signout" method="post">

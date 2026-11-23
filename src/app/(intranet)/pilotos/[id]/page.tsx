@@ -122,7 +122,7 @@ export default async function PilotoPage({ params }: PageProps<"/pilotos/[id]">)
                   {[...runs].reverse().map((r) => {
                     const st = runStats(r);
                     return (
-                      <tr key={r.id} className="align-top">
+                      <tr key={r.id} className="align-top [&>td]:py-2">
                         <td className="py-2 whitespace-nowrap">{dayShort(r.fecha)}</td>
                         <td>#{r.intento}</td>
                         <td>{r.project_id ? projectName.get(r.project_id) : "—"}</td>

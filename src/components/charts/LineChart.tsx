@@ -29,7 +29,7 @@ function niceTicks(min: number, max: number, count = 4) {
  * cada línea cuando no se pisan, y la tabla con todos los datos.
  */
 export default function LineChart({
-  x, series, format, height = 240, caption, note,
+  x, series, format, height = 240, caption, note, legend,
 }: {
   x: { key: string; label: string }[];
   series: ChartSeries[];
@@ -37,6 +37,8 @@ export default function LineChart({
   height?: number;
   caption: string;
   note?: string;
+  /** Mostrar la leyenda aunque haya una sola serie (p. ej. cuando cada serie es una persona). */
+  legend?: boolean;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(640);
@@ -93,7 +95,7 @@ export default function LineChart({
 
   return (
     <figure className="min-w-0">
-      {multi && (
+      {(multi || legend) && (
         <figcaption className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-600">
           {series.map((s) => (
             <span key={s.name} className="flex items-center gap-1.5">
@@ -129,7 +131,7 @@ export default function LineChart({
             </g>
           ))}
           {x.map((p, i) => (i % every === 0 || i === x.length - 1) && (
-            <text key={p.key} x={px(i)} y={height - 8} textAnchor="middle" fontSize={11} fill="#78716c">{p.label}</text>
+            <text key={p.key} x={px(i)} y={height - 8} textAnchor={x.length > 1 && i === 0 ? "start" : x.length > 1 && i === x.length - 1 && !showEnds ? "end" : "middle"} fontSize={11} fill="#78716c">{p.label}</text>
           ))}
           {hover !== null && <line x1={hx} x2={hx} y1={top} y2={top + plotH} stroke="#a8a29e" strokeWidth={1} />}
           {series.map((s) => {
