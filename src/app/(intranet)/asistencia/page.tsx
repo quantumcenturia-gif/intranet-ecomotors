@@ -8,6 +8,7 @@ import { SESSION_STYLES, TIPO_STYLES, dayLabel, hhmm, type AttendanceRecord, typ
 import { requireMe } from "@/lib/me";
 import { flattenTree, subtree } from "@/lib/units";
 import { markAttendance, openSession } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AsistenciaPage() {
   await connection();
@@ -41,7 +42,7 @@ export default async function AsistenciaPage() {
       <section className="mb-6">
         <h2 className="mb-3 flex items-center gap-2 font-semibold"><DoorOpen className="h-5 w-5 text-brand-600" /> Asistencias abiertas para ti</h2>
         {openForMe.length ? (
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="stagger grid gap-3 md:grid-cols-2">
             {openForMe.map((s) => {
               const r = myRec.get(s.id);
               return (
@@ -56,7 +57,7 @@ export default async function AsistenciaPage() {
                       <form action={markAttendance}>
                         <input type="hidden" name="session_id" value={s.id} />
                         <input type="hidden" name="kind" value="entrada" />
-                        <button className={btnPrimary}><LogIn className="h-4 w-4" /> Marcar entrada</button>
+                        <SubmitButton className={btnPrimary}><LogIn className="h-4 w-4" /> Marcar entrada</SubmitButton>
                       </form>
                     ) : (
                       <span className="text-sm">Entrada: <b>{hhmm(r.entrada)}</b></span>
@@ -65,7 +66,7 @@ export default async function AsistenciaPage() {
                       <form action={markAttendance}>
                         <input type="hidden" name="session_id" value={s.id} />
                         <input type="hidden" name="kind" value="salida" />
-                        <button className={btnDark}><LogOut className="h-4 w-4" /> Marcar salida</button>
+                        <SubmitButton className={btnDark}><LogOut className="h-4 w-4" /> Marcar salida</SubmitButton>
                       </form>
                     )}
                     {r?.salida && <span className="text-sm">Salida: <b>{hhmm(r.salida)}</b> · {r.horas} h ✅</span>}
@@ -110,13 +111,13 @@ export default async function AsistenciaPage() {
               Solo puede haber una asistencia abierta por área y, como máximo, una de área por día.
               {isAdmin && " Las reuniones y prácticas especiales solo las abre dirección general."}
             </p>
-            <button className={btnPrimary}><DoorOpen className="h-4 w-4" /> Abrir asistencia</button>
+            <SubmitButton className={btnPrimary}><DoorOpen className="h-4 w-4" /> Abrir asistencia</SubmitButton>
           </form>
 
           <section className={`${card} overflow-hidden lg:col-span-3`}>
             <h2 className="flex items-center gap-2 border-b border-neutral-100 p-4 font-semibold"><Users className="h-5 w-5 text-brand-600" /> Asistencias que gestionas</h2>
             {managed.length ? (
-              <ul className="divide-y divide-neutral-100">
+              <ul className="stagger divide-y divide-neutral-100">
                 {managed.slice(0, 20).map((s) => (
                   <li key={s.id}>
                     <Link href={`/asistencia/${s.id}`} className="flex items-center gap-3 p-4 hover:bg-neutral-50">

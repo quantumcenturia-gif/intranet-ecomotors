@@ -87,7 +87,7 @@ export default async function MemberDashboard({
           <span className="text-sm font-medium text-amber-800">Leer →</span>
         </Link>
       )}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="stagger grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Kpi icon={ListChecks} label="Tareas abiertas" value={String(open.length)} sub={late.length ? `${late.length} atrasada${late.length > 1 ? "s" : ""}` : "Ninguna atrasada"} warn={late.length > 0} />
         <Kpi icon={CheckCircle2} label="Tareas completadas" value={String(done.length)} sub={horasTareas ? `+${fmtHoras(horasTareas)} reconocidas` : `${perMonth.at(-1)!.value} este mes`} />
         <Kpi icon={CalendarCheck2} label="Asistencia (90 días)" value={pct === null ? "—" : `${pct} %`} sub={convocadas.length ? `${asistidas} de ${convocadas.length} sesiones` : "Sin sesiones aún"} />
@@ -123,7 +123,7 @@ export default async function MemberDashboard({
 
 function Kpi({ icon: Icon, label, value, sub, warn }: { icon: typeof Clock; label: string; value: string; sub?: string; warn?: boolean }) {
   return (
-    <div className={`${card} group animate-rise p-4`}>
+    <div className={`${card} group p-4 transition hover:-translate-y-0.5 hover:shadow-md`}>
       <p className="mb-1 flex items-center gap-1.5 text-xs text-neutral-500"><Icon className="h-4 w-4 text-brand-600 group-hover:animate-wiggle" /> {label}</p>
       <p className="text-2xl font-bold">{value}</p>
       {sub && <p className={`text-xs ${warn ? "font-medium text-brand-700" : "text-neutral-500"}`}>{warn ? "⚠️ " : ""}{sub}</p>}
@@ -137,7 +137,7 @@ function ProgressMeter({ value }: { value: number }) {
     <div className="flex min-w-48 items-center gap-3" role="meter" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} aria-label="Avance medio de las tareas abiertas">
       <span className="text-xs text-neutral-500">Avance medio</span>
       <div className="h-2 flex-1 overflow-hidden rounded-full bg-brand-100">
-        <div className="h-full rounded-full bg-brand-600 transition-[width] duration-700" style={{ width: `${value}%` }} />
+        <div className="grow-x h-full rounded-full bg-brand-600" style={{ width: `${value}%` }} />
       </div>
       <span className="text-sm font-semibold">{value} %</span>
     </div>

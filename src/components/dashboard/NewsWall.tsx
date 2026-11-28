@@ -18,7 +18,7 @@ export default function NewsWall({ news }: { news: News[] }) {
         </Link>
       </div>
       {news.length ? (
-        <ul className="space-y-4">
+        <ul className="stagger space-y-4">
           {news.map((n) => (
             <li key={n.id} className="flex gap-4 border-l-4 border-brand-500 pl-4">
               {n.image_url && <img src={n.image_url} alt="" className="h-16 w-24 shrink-0 rounded-md object-cover" />}

@@ -6,6 +6,7 @@ import { DIRIGIDO_A, EVENT_STYLES, EVENT_TIPOS } from "@/data/eco-motors";
 import { eventDayKey, formatEvent, upcomingEvents, type EventRow } from "@/lib/events";
 import { requireMe } from "@/lib/me";
 import { createEvent, deleteEvent } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function CalendarioPage() {
   await connection();
@@ -45,7 +46,7 @@ export default async function CalendarioPage() {
               </div>
             </div>
             <Label label="Notas" className="sm:col-span-3"><textarea name="notas" rows={2} className={inputCls} /></Label>
-            <div><button className={btnPrimary}><Plus className="h-4 w-4" /> Guardar actividad</button></div>
+            <div><SubmitButton className={btnPrimary}><Plus className="h-4 w-4" /> Guardar actividad</SubmitButton></div>
           </form>
         </details>
       )}
@@ -71,7 +72,7 @@ export default async function CalendarioPage() {
                   {isManager && (
                     <form action={deleteEvent}>
                       <input type="hidden" name="id" value={e.id} />
-                      <button aria-label="Borrar" className="text-neutral-300 hover:text-brand-600"><Trash2 className="h-4 w-4" /></button>
+                      <SubmitButton aria-label="Borrar" className="text-neutral-300 hover:text-brand-600"><Trash2 className="h-4 w-4" /></SubmitButton>
                     </form>
                   )}
                 </div>

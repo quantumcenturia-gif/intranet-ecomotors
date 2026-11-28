@@ -9,6 +9,7 @@ import {
 import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
 import { flattenTree } from "@/lib/units";
 import { createReport, deleteSheet, markRead, saveSheet, updateReport } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 type Report = {
   id: number; fecha: string; tipo: string; severidad: string; descripcion: string; lugar: string | null; accion: string | null; estado: string;
@@ -56,7 +57,7 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
     <>
       <PageHeader icon={HardHat} title="Seguridad" subtitle="Trabajos de riesgo, reportes y fichas · la seguridad es de todos" />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="stagger mb-6 grid gap-4 sm:grid-cols-3">
         <div className="flex items-center gap-4 rounded-xl bg-black p-5 text-white sm:col-span-1">
           <ShieldCheck className="h-10 w-10 shrink-0 text-emerald-400 animate-float" />
           <div>
@@ -82,7 +83,7 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
 
       <nav className="mb-6 flex flex-wrap gap-1 rounded-xl bg-neutral-200/60 p-1">
         {vistas.map((v) => (
-          <Link key={v} href={`/seguridad?vista=${v}`} className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium ${vista === v ? "bg-black text-white" : "text-neutral-600 hover:bg-neutral-200"}`}>
+          <Link key={v} href={`/seguridad?vista=${v}`} className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition duration-200 active:scale-95 ${vista === v ? "bg-black text-white shadow-md" : "text-neutral-600 hover:bg-neutral-200"}`}>
             {label[v]}
             {!!badge[v] && <span className="rounded-full bg-amber-500 px-1.5 text-xs text-white">{badge[v]}</span>}
           </Link>
@@ -92,7 +93,7 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
       {/* ---------- Por aprobar (solo Seguridad) ---------- */}
       {vista === "aprobar" && (
         pendientes.length ? (
-          <div className="space-y-3">
+          <div className="stagger space-y-3">
             {pendientes.map((t) => <RiskCard key={t.id} t={t} action="Revisar y decidir" />)}
           </div>
         ) : (
@@ -142,12 +143,12 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
                 </select>
               </Label>
               <p className="text-xs text-neutral-500 sm:col-span-2">El objetivo es prevenir, no castigar. Si indicas a una persona, recibirá un aviso respetuoso y Seguridad lo revisará con ella.</p>
-              <div><button className={btnPrimary}>Enviar reporte</button></div>
+              <div><SubmitButton className={btnPrimary}>Enviar reporte</SubmitButton></div>
             </form>
           </details>
 
           {reports.length ? (
-            <ul className="space-y-3">
+            <ul className="stagger space-y-3">
               {reports.map((r) => (
                 <li key={r.id} className={`${card} p-5`}>
                   <div className="flex flex-wrap items-center gap-2">
@@ -166,7 +167,7 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
                       <input type="hidden" name="id" value={r.id} />
                       <select name="estado" defaultValue={r.estado} className={inputCls}>{REPORTE_ESTADOS.map((e) => <option key={e}>{e}</option>)}</select>
                       <input name="accion" defaultValue={r.accion ?? ""} placeholder="Acción correctiva (charla, entrega de EPP, arreglo…)" className={inputCls} />
-                      <button className={btnDark}>Guardar</button>
+                      <SubmitButton className={btnDark}>Guardar</SubmitButton>
                     </form>
                   )}
                 </li>
@@ -214,7 +215,7 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
                   {s.publicada && (readAt.has(s.id) ? (
                     <span className="text-sm text-emerald-700">✅ La leíste el {new Date(readAt.get(s.id)!).toLocaleDateString("es-PE", { day: "numeric", month: "short" })}</span>
                   ) : member ? (
-                    <form action={markRead}><input type="hidden" name="id" value={s.id} /><button className={btnPrimary}>📖 Leí y entendí</button></form>
+                    <form action={markRead}><input type="hidden" name="id" value={s.id} /><SubmitButton className={btnPrimary}>📖 Leí y entendí</SubmitButton></form>
                   ) : null)}
                   {isSafety && s.publicada && (
                     <details className="text-sm">
@@ -226,7 +227,7 @@ export default async function SeguridadPage({ searchParams }: PageProps<"/seguri
                     <details className="w-full">
                       <summary className="cursor-pointer text-sm text-brand-600">✏️ Editar, publicar o borrar</summary>
                       <SheetForm s={s} />
-                      <form action={deleteSheet} className="mt-2"><input type="hidden" name="id" value={s.id} /><button className="flex items-center gap-1 text-sm text-red-600 hover:underline"><Trash2 className="h-4 w-4" /> Borrar ficha</button></form>
+                      <form action={deleteSheet} className="mt-2"><input type="hidden" name="id" value={s.id} /><SubmitButton className="flex items-center gap-1 text-sm text-red-600 hover:underline"><Trash2 className="h-4 w-4" /> Borrar ficha</SubmitButton></form>
                     </details>
                   )}
                 </div>
@@ -284,7 +285,7 @@ function SheetForm({ s }: { s?: Sheet }) {
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="obligatoria" defaultChecked={s?.obligatoria} className="accent-amber-600" /> Obligatoria (todos deben leerla)</label>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="publicada" defaultChecked={s ? s.publicada : true} className="accent-amber-600" /> Publicada (visible para el equipo)</label>
       <p className="text-xs text-neutral-500 sm:col-span-2">Al publicar una ficha obligatoria, todo el equipo recibe un aviso para leerla.</p>
-      <div><button className={btnPrimary}>Guardar ficha</button></div>
+      <div><SubmitButton className={btnPrimary}>Guardar ficha</SubmitButton></div>
     </form>
   );
 }

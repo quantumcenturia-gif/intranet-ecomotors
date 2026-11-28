@@ -6,6 +6,7 @@ import { ROLE_STYLES } from "@/data/eco-motors";
 import { requireMe } from "@/lib/me";
 import { unitPath } from "@/lib/units";
 import { updateProfile } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function PerfilPage() {
   const { supabase, user, profile, member, units } = await requireMe();
@@ -86,7 +87,7 @@ export default async function PerfilPage() {
               <Label label="Sobre mí"><textarea name="bio" rows={3} defaultValue={member.bio ?? ""} className={inputCls} placeholder="Qué haces en el equipo, habilidades…" /></Label>
             </>
           )}
-          <button className={btnPrimary}><Save className="h-4 w-4" /> Guardar</button>
+          <SubmitButton className={btnPrimary}><Save className="h-4 w-4" /> Guardar</SubmitButton>
         </form>
       </details>
     </>

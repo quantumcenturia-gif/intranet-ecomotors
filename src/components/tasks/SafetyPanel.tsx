@@ -3,6 +3,7 @@ import { Badge, Label, btnPrimary, card, inputCls } from "@/components/ui";
 import { PERMISO_ICON, PERMISO_STYLES, RIESGOS, RIESGO_STYLES, fmtFechaHora, necesitaPermiso } from "@/lib/safety";
 import type { TaskRow } from "@/lib/tasks";
 import { safetyDecide } from "@/app/(intranet)/tareas/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 /** Ficha de seguridad de una tarea: riesgo, permiso de trabajo, EPP y, para Seguridad, la decisión. */
 export default function SafetyPanel({ task, isSafety, approver }: { task: TaskRow; isSafety: boolean; approver?: string | null }) {
@@ -78,7 +79,7 @@ export default function SafetyPanel({ task, isSafety, approver }: { task: TaskRo
               {RIESGOS.filter((r) => r !== task.riesgo).map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
           </Label>
-          <button className={btnPrimary}>Guardar decisión</button>
+          <SubmitButton className={btnPrimary}>Guardar decisión</SubmitButton>
         </form>
       )}
     </section>

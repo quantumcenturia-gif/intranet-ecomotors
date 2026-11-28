@@ -18,7 +18,7 @@ export default function UpcomingBirthdays({ people, withinDays = 30 }: { people:
         <Cake className="h-5 w-5 text-brand-600" /> Próximos cumpleaños
       </h2>
       {upcoming.length ? (
-        <ul className="space-y-3">
+        <ul className="stagger space-y-3">
           {upcoming.map((p) => (
             <li key={p.id} className="flex items-center gap-3">
               <Avatar name={p.full_name} src={p.avatar_url} size={36} />

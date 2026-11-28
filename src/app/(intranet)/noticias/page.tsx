@@ -7,6 +7,7 @@ import { requireMe } from "@/lib/me";
 import { formatDate } from "@/lib/format";
 import { flattenTree } from "@/lib/units";
 import { createAnnouncement, deleteAnnouncement } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 type News = {
   id: number; title: string; body: string; created_at: string; image_url: string | null; unit_id: string | null; author_id: string | null;
@@ -45,13 +46,13 @@ export default async function NoticiasPage() {
           <textarea name="body" required rows={3} placeholder="Escribe el comunicado…" className={inputCls} />
           <input name="image" type="file" accept="image/*" className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-2" />
           <p className="text-xs text-neutral-500">Si eliges un área, lo verán y recibirán el aviso solo sus miembros (incluidas sus subáreas).</p>
-          <button className="group flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
+          <SubmitButton className="group flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
             <Send className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /> Publicar comunicado
-          </button>
+          </SubmitButton>
         </form>
       )}
 
-      <div className="space-y-4">
+      <div className="stagger space-y-4">
         {news?.length ? (
           news.map((n) => (
             <article key={n.id} className={`${card} overflow-hidden`}>
@@ -62,9 +63,9 @@ export default async function NoticiasPage() {
                   {canDelete(n) && (
                     <form action={deleteAnnouncement}>
                       <input type="hidden" name="id" value={n.id} />
-                      <button aria-label="Borrar" className="text-neutral-400 hover:text-red-600">
+                      <SubmitButton aria-label="Borrar" className="text-neutral-400 hover:text-red-600">
                         <Trash2 className="h-4 w-4" />
-                      </button>
+                      </SubmitButton>
                     </form>
                   )}
                 </div>

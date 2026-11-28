@@ -8,6 +8,7 @@ import { card } from "@/components/ui";
 import { requireMe, type Member } from "@/lib/me";
 import { RUN_SELECT, SERIES_COLORS, bestByDay, dayShort, fmtLap, runStats, type PilotRun } from "@/lib/pilots";
 import { deleteRun } from "../actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function PilotoPage({ params }: PageProps<"/pilotos/[id]">) {
   const { id } = await params;
@@ -137,7 +138,7 @@ export default async function PilotoPage({ params }: PageProps<"/pilotos/[id]">)
                         <td className="max-w-40 truncate">{r.traje ?? "—"}</td>
                         {canManage && (
                           <td className="text-right">
-                            <form action={deleteRun}><input type="hidden" name="id" value={r.id} /><button aria-label="Borrar intento" className="text-neutral-300 hover:text-red-600"><Trash2 className="h-4 w-4" /></button></form>
+                            <form action={deleteRun}><input type="hidden" name="id" value={r.id} /><SubmitButton aria-label="Borrar intento" className="text-neutral-300 hover:text-red-600"><Trash2 className="h-4 w-4" /></SubmitButton></form>
                           </td>
                         )}
                       </tr>

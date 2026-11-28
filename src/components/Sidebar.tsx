@@ -1,10 +1,10 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element -- logo estático pequeño */
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { BarChart3, Bell, Eye, HardHat, Timer, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarChart3, Bell, Eye, HardHat, Loader2, Timer, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
@@ -32,24 +32,49 @@ export default function Sidebar({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // Cajón del celular: se cierra con Escape y no deja desplazar la página de fondo
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   return (
     <>
-      <header className="flex items-center justify-between print:hidden border-b-2 border-brand-600 bg-black px-4 py-2 text-white md:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between print:hidden border-b-2 border-brand-600 bg-black px-4 py-2 text-white md:hidden">
         <img src="/logo-eco-motors.png" alt="Eco Motors" className="h-8 w-auto" />
         <div className="flex items-center gap-4">
         <Link href="/avisos" aria-label="Avisos" className="relative">
           <Bell className={`h-6 w-6 origin-top ${unread > 0 ? "animate-ring" : ""}`} />
           {unread > 0 && <span className="absolute -right-1.5 -top-1.5 rounded-full bg-brand-600 px-1.5 text-[10px] font-bold">{unread}</span>}
         </Link>
-        <button onClick={() => setOpen(!open)} aria-label="Menú">
+        <button onClick={() => setOpen(!open)} aria-label={open ? "Cerrar menú" : "Abrir menú"} aria-expanded={open} className="rounded-lg p-1 transition active:scale-90">
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
         </div>
       </header>
 
+      {/* Fondo oscuro detrás del cajón (solo celular) */}
+      <div
+        onClick={() => setOpen(false)}
+        aria-hidden
+        className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-[1px] transition-opacity duration-300 md:hidden print:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      />
       <aside
-        className={`${open ? "flex" : "hidden"} print:!hidden flex-col bg-black text-white md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-black text-white shadow-2xl transition-transform duration-300 ease-out print:!hidden md:sticky md:top-0 md:z-auto md:h-screen md:w-64 md:max-w-none md:shrink-0 md:translate-x-0 md:shadow-none ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
+        <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
+          <img src="/logo-eco-motors.png" alt="Eco Motors" className="h-8 w-auto" />
+          <button onClick={() => setOpen(false)} aria-label="Cerrar menú" className="rounded-lg p-1 text-neutral-300 transition hover:text-white active:scale-90">
+            <X className="h-6 w-6" />
+          </button>
+        </div>
         <div className="hidden shrink-0 px-6 pt-7 pb-5 md:block">
           <img src="/logo-eco-motors.png" alt="Eco Motors" className="w-full" />
         </div>
@@ -63,13 +88,14 @@ export default function Sidebar({
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200 active:scale-[0.98] ${
                   active
                     ? "bg-brand-600 text-white shadow-lg shadow-brand-900/40"
-                    : "text-neutral-300 hover:bg-white/10 hover:text-white"
+                    : "text-neutral-300 hover:translate-x-0.5 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <Icon className={`h-5 w-5 ${href === "/avisos" && unread > 0 ? "origin-top animate-ring" : "group-hover:animate-wiggle"}`} /> {label}
+                <Icon className={`h-5 w-5 shrink-0 ${href === "/avisos" && unread > 0 ? "origin-top animate-ring" : "group-hover:animate-wiggle"}`} /> {label}
+                <Pending />
                 {href === "/avisos" && unread > 0 && (
                   <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-bold ${active ? "bg-white text-brand-600" : "bg-brand-600 text-white"}`}>
                     {unread > 99 ? "99+" : unread}
@@ -92,4 +118,10 @@ export default function Sidebar({
       </aside>
     </>
   );
+}
+
+/** Pequeño indicador mientras carga la página del enlace pulsado. */
+function Pending() {
+  const { pending } = useLinkStatus();
+  return pending ? <Loader2 aria-label="Cargando" className="ml-auto h-4 w-4 shrink-0 animate-spin opacity-80" /> : null;
 }

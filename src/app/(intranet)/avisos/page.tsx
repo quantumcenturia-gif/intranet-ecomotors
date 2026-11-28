@@ -4,6 +4,7 @@ import PageHeader from "@/components/PageHeader";
 import { btnGhost, card } from "@/components/ui";
 import { requireMe } from "@/lib/me";
 import { markAllRead } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AvisosPage() {
   const { supabase, member } = await requireMe();
@@ -17,12 +18,12 @@ export default async function AvisosPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PageHeader icon={Bell} title="Avisos" subtitle={unread ? `${unread} sin leer` : "Estás al día"} />
         {unread > 0 && (
-          <form action={markAllRead}><button className={btnGhost}><CheckCheck className="h-4 w-4" /> Marcar todo como leído</button></form>
+          <form action={markAllRead}><SubmitButton className={btnGhost}><CheckCheck className="h-4 w-4" /> Marcar todo como leído</SubmitButton></form>
         )}
       </div>
       <div className={`${card} overflow-hidden`}>
         {data?.length ? (
-          <ul className="divide-y divide-neutral-100">
+          <ul className="stagger divide-y divide-neutral-100">
             {data.map((n) => (
               <li key={n.id}>
                 <Link href={`/aviso/${n.id}`} className={`flex gap-3 p-4 hover:bg-neutral-50 ${n.read_at ? "" : "bg-brand-50/50"}`}>

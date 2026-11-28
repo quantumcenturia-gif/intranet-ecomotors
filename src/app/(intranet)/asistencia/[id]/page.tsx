@@ -7,6 +7,7 @@ import { SESSION_STYLES, TIPO_STYLES, dayLabel, fmtHours, hhmm, type AttendanceR
 import { requireMe, type Member } from "@/lib/me";
 import { subtree } from "@/lib/units";
 import { closeSession, deleteSession, setRecord, verifySession } from "../actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function SesionPage({ params }: PageProps<"/asistencia/[id]">) {
   const id = Number((await params).id);
@@ -59,7 +60,7 @@ export default async function SesionPage({ params }: PageProps<"/asistencia/[id]
           {s.estado === "Abierta" && (
             <form action={closeSession}>
               <input type="hidden" name="session_id" value={s.id} />
-              <button className={btnDark}><XCircle className="h-4 w-4" /> Cerrar asistencia</button>
+              <SubmitButton className={btnDark}><XCircle className="h-4 w-4" /> Cerrar asistencia</SubmitButton>
             </form>
           )}
           {s.estado === "Cerrada" && (
@@ -68,7 +69,7 @@ export default async function SesionPage({ params }: PageProps<"/asistencia/[id]
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" name="confirm" className="h-4 w-4 accent-brand-600" /> He revisado las entradas y salidas
               </label>
-              <button className={btnPrimary}><CheckCircle2 className="h-4 w-4" /> Verificar y guardar</button>
+              <SubmitButton className={btnPrimary}><CheckCircle2 className="h-4 w-4" /> Verificar y guardar</SubmitButton>
             </form>
           )}
           {locked && (
@@ -79,7 +80,7 @@ export default async function SesionPage({ params }: PageProps<"/asistencia/[id]
           {(!locked || isAdmin) && (
             <form action={deleteSession} className="ml-auto">
               <input type="hidden" name="session_id" value={s.id} />
-              <button className="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-brand-600"><Trash2 className="h-4 w-4" /> Borrar</button>
+              <SubmitButton className="flex items-center gap-1.5 text-sm text-neutral-400 hover:text-brand-600"><Trash2 className="h-4 w-4" /> Borrar</SubmitButton>
             </form>
           )}
         </div>
@@ -118,9 +119,9 @@ export default async function SesionPage({ params }: PageProps<"/asistencia/[id]
                       <span className="w-16 font-medium text-neutral-800">{r?.horas ? fmtHours(Number(r.horas)) : r ? "—" : "Ausente"}</span>
                       <input name="observacion" defaultValue={r?.observacion ?? ""} disabled={locked} placeholder={locked ? "" : "Opcional"} className="min-w-0 flex-1 rounded-md border border-neutral-300 px-2 py-1 text-sm disabled:border-transparent disabled:bg-transparent" />
                       {!locked && (
-                        <button className="rounded-md bg-black p-1.5 text-white hover:bg-neutral-800" aria-label="Guardar fila" title="Guardar corrección">
+                        <SubmitButton className="rounded-md bg-black p-1.5 text-white hover:bg-neutral-800" aria-label="Guardar fila" title="Guardar corrección">
                           <Save className="h-4 w-4" />
-                        </button>
+                        </SubmitButton>
                       )}
                     </form>
                   </td>

@@ -15,7 +15,7 @@ export default function UpcomingEvents({ events }: { events: EventRow[] }) {
         </Link>
       </div>
       {events.length ? (
-        <ul className="space-y-3">
+        <ul className="stagger space-y-3">
           {events.slice(0, 5).map((e) => (
             <li key={e.id} className="flex items-start gap-3">
               <span className={`mt-0.5 shrink-0 rounded-md px-2 py-0.5 text-xs font-medium ${EVENT_STYLES[e.tipo] ?? EVENT_STYLES.Otro}`}>{e.tipo}</span>
