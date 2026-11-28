@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  CalendarClock, CheckCircle2, ChevronRight, Download, FileText, FolderKanban, GitBranch,
-  ListChecks, MessageSquare, Paperclip, Pencil, Plus, Send, Trash2, Upload, User,
-} from "lucide-react";
+import { CalendarClock, CheckCircle2, ChevronRight, Download, FileText, FolderKanban, GitBranch, ListChecks, MessageSquare, Paperclip, Pencil, Plus, Send, Timer, Trash2, Upload, User, Users } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import TaskFields from "@/components/tasks/TaskFields";
 import TaskList from "@/components/tasks/TaskList";
@@ -11,7 +8,7 @@ import { Badge, Label, btnDark, btnGhost, btnPrimary, card, inputCls } from "@/c
 import { ESTADO_STYLES, PRIORIDAD_STYLES, estadoVisible } from "@/data/eco-motors";
 import { formatSize } from "@/lib/format";
 import { requireMe } from "@/lib/me";
-import { TASK_SELECT, formatShortDate, type TaskRow } from "@/lib/tasks";
+import { TASK_SELECT, fmtHoras, formatShortDate, type TaskRow } from "@/lib/tasks";
 import { unitPath } from "@/lib/units";
 import {
   addComment, decideVolunteer, deleteEvidence, deleteTask, downloadEvidence, reviewTask, unvolunteer, updateProgress, updateTask, uploadEvidence, volunteer,
@@ -54,6 +51,9 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
   const volunteers = (vols ?? []) as unknown as Vol[];
 
   const canManage = manageable.has(task.unit_id);
+  const collaborators = (task.participants ?? []).map((p) => p.member).filter((x): x is NonNullable<typeof x> => !!x);
+  const involved = [task.assignee, ...collaborators].filter(Boolean).length;
+  const validated = task.estado === "Completada y validada";
   const isCreator = !!member && member.id === task.created_by;
   const openCall = task.convocatoria && !["Completada y validada", "Cancelada"].includes(task.estado);
   const canVolunteer = openCall && !!member && !isCreator && subtree(units, task.unit_id).includes(member.unit_id);
@@ -108,7 +108,10 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
           {/* Convocatoria */}
           {task.convocatoria && (
             <section className={`${card} border-l-4 border-l-brand-600 p-6`}>
-              <h2 className="mb-1 flex items-center gap-2 font-semibold">📣 Convocatoria abierta a {unitLabel.get(task.unit_id)}</h2>
+              <h2 className="mb-1 flex flex-wrap items-center gap-2 font-semibold">
+                📣 Convocatoria abierta a {unitLabel.get(task.unit_id)}
+                {task.horas && <span className="rounded-full bg-black px-2.5 py-0.5 text-xs font-semibold text-white">⏱ Vale {fmtHoras(task.horas)} para quien la haga</span>}
+              </h2>
               <p className="mb-4 text-sm text-neutral-600">
                 {openCall ? "Los integrantes de esta área pueden apuntarse. Quien la publicó elige a quién acepta; a cada persona aceptada se le crea su subtarea." : "Esta convocatoria está cerrada."}
               </p>
@@ -202,6 +205,11 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                   )}
                 </div>
               )}
+              {["Completada y validada", "Cancelada"].includes(task.estado) ? (
+                <p className="rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
+                  {task.estado === "Cancelada" ? "Esta tarea fue cancelada." : "✅ Esta tarea ya fue validada."} Si hay que reabrirla, el responsable del área cambia su estado en «Revisión».
+                </p>
+              ) : (
               <form key={`p-${task.updated_at}`} action={updateProgress} className="grid gap-4 sm:grid-cols-2">
                 <input type="hidden" name="id" value={task.id} />
                 <Label label={`Avance (%)`}>
@@ -228,6 +236,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                   <button className={btnPrimary}>Guardar avance</button>
                 </div>
               </form>
+              )}
             </section>
           )}
 
@@ -319,6 +328,30 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                 </Link>
               ) : "Sin asignar"}
             </Row>
+            {collaborators.length > 0 && (
+              <Row icon={Users} label={`Colaboradores (${collaborators.length})`}>
+                <ul className="space-y-1.5">
+                  {collaborators.map((c) => (
+                    <li key={c.id}>
+                      <Link href={`/directorio/${c.id}`} className="flex items-center gap-2 hover:text-brand-600">
+                        <Avatar name={c.full_name} src={c.avatar_url} size={22} /> <span className="truncate">{c.full_name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Row>
+            )}
+            <Row icon={Timer} label="Horas">
+              {task.horas ? (
+                validated ? (
+                  <span className="text-emerald-700">✅ Se sumaron <b>{fmtHoras(task.horas)}</b> a {involved === 1 ? "la persona responsable" : `cada una de las ${involved} personas`}</span>
+                ) : (
+                  <span>Vale <b>{fmtHoras(task.horas)}</b> por persona · se suman al validarla</span>
+                )
+              ) : (
+                <span className="text-neutral-500">Sin horas asignadas</span>
+              )}
+            </Row>
             <Row icon={User} label="Asignada por">{task.creator?.full_name ?? "—"}</Row>
             <Row icon={CalendarClock} label="Fechas">
               Asignada {formatShortDate(task.fecha_asignacion)} · Límite <b>{formatShortDate(task.fecha_limite)}</b>
@@ -355,6 +388,14 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                     <option>En proceso</option>
                     <option>Cancelada</option>
                   </select>
+                  {!task.convocatoria && (
+                    <Label label="Horas a sumar a cada persona (si la validas)">
+                      <input type="number" name="horas" min={0.5} max={500} step={0.5} defaultValue={task.horas ?? ""} placeholder="Sin horas" className={inputCls} />
+                      <span className="mt-1 block text-xs text-neutral-500">
+                        {involved ? `Se sumarán a ${[task.assignee?.full_name, ...collaborators.map((c) => c.full_name)].filter(Boolean).map((n) => n!.split(" ")[0]).join(", ")}.` : "Asigna un responsable para que reciba las horas."} Puedes ajustarlas si el trabajo fue parcial.
+                      </span>
+                    </Label>
+                  )}
                   <textarea name="resultado_revision" rows={3} placeholder="Comentario de la revisión…" className={inputCls} />
                   <button className={`${btnPrimary} w-full`}>Guardar revisión</button>
                 </form>
@@ -369,7 +410,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               </summary>
               <form key={`e-${task.updated_at}`} action={updateTask} className="mt-4 space-y-4 [&_.sm\:grid-cols-2]:grid-cols-1">
                 <input type="hidden" name="id" value={task.id} />
-                <TaskFields task={task} units={units} manageable={manageable} members={members ?? []} projects={projects ?? []} canAssign />
+                <TaskFields task={task} units={units} manageable={manageable} members={members ?? []} projects={projects ?? []} canAssign participantIds={collaborators.map((c) => c.id)} />
                 <button className={`${btnDark} w-full`}>Guardar cambios</button>
               </form>
               <form action={deleteTask} className="mt-3">

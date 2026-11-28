@@ -10,7 +10,7 @@ import { estadoVisible } from "@/data/eco-motors";
 import { fmtHours, weeklyHours } from "@/lib/attendance";
 import type { Member } from "@/lib/me";
 import { RUN_SELECT, type PilotRun } from "@/lib/pilots";
-import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
+import { TASK_SELECT, fmtHoras, mineFilter, participantTaskIds, type TaskRow } from "@/lib/tasks";
 import { subtree, type Unit } from "@/lib/units";
 
 const CLOSED = ["Completada y validada", "Cancelada"];
@@ -31,15 +31,18 @@ export default async function MemberDashboard({
   const since = sinceDate.toISOString().slice(0, 10);
   const isPilot = m.unit_id === "pilotos";
 
-  const [{ data: tasksData }, { data: history }, { data: sessions }, { data: marks }, { data: runsData }] = await Promise.all([
-    supabase.from("tasks").select(TASK_SELECT).eq("assignee_id", m.id).order("fecha_limite", { ascending: true, nullsFirst: false }).returns<TaskRow[]>(),
+  const collab = await participantTaskIds(supabase, m.id);
+  const [{ data: tasksData }, { data: history }, { data: sessions }, { data: marks }, { data: runsData }, { data: taskHours }] = await Promise.all([
+    supabase.from("tasks").select(TASK_SELECT).or(mineFilter(m.id, collab)).order("fecha_limite", { ascending: true, nullsFirst: false }).returns<TaskRow[]>(),
     supabase.from("attendance_records").select(HISTORY_SELECT).eq("member_id", m.id).order("id", { ascending: false }).limit(200).returns<HistoryRow[]>(),
     supabase.from("attendance_sessions").select("id,unit_id,fecha,estado").gte("fecha", since).neq("estado", "Abierta"),
     supabase.from("attendance_records").select("session_id,entrada").eq("member_id", m.id).not("entrada", "is", null),
     isPilot
       ? supabase.from("pilot_runs").select(RUN_SELECT).eq("piloto_id", m.id).order("fecha").order("intento").returns<PilotRun[]>()
       : Promise.resolve({ data: [] as PilotRun[] }),
+    supabase.from("time_entries").select("horas").eq("member_id", m.id).eq("origen", "tarea"),
   ]);
+  const horasTareas = (taskHours ?? []).reduce((a, r) => a + Number(r.horas), 0);
 
   const tasks = tasksData ?? [];
   const open = tasks.filter((t) => !CLOSED.includes(t.estado));
@@ -71,7 +74,7 @@ export default async function MemberDashboard({
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Kpi icon={ListChecks} label="Tareas abiertas" value={String(open.length)} sub={late.length ? `${late.length} atrasada${late.length > 1 ? "s" : ""}` : "Ninguna atrasada"} warn={late.length > 0} />
-        <Kpi icon={CheckCircle2} label="Tareas completadas" value={String(done.length)} sub={`${perMonth.at(-1)!.value} este mes`} />
+        <Kpi icon={CheckCircle2} label="Tareas completadas" value={String(done.length)} sub={horasTareas ? `+${fmtHoras(horasTareas)} reconocidas` : `${perMonth.at(-1)!.value} este mes`} />
         <Kpi icon={CalendarCheck2} label="Asistencia (90 días)" value={pct === null ? "—" : `${pct} %`} sub={convocadas.length ? `${asistidas} de ${convocadas.length} sesiones` : "Sin sesiones aún"} />
         <Kpi icon={Clock} label="Horas esta semana" value={fmtHours(week.verificadas + week.pendientes)} sub={week.pendientes ? `${fmtHours(week.pendientes)} por verificar` : "Asistencias del área"} />
       </div>

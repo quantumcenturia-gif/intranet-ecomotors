@@ -19,7 +19,7 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
   const [{ data: entries }, { data: myTasks }] = await Promise.all([
     supabase
       .from("time_entries")
-      .select("id,fecha,horas,actividad,member_id,task:tasks(id,title),member:members(id,full_name,avatar_url,unit_id)")
+      .select("id,fecha,horas,actividad,member_id,origen,task:tasks(id,title),member:members(id,full_name,avatar_url,unit_id)")
       .gte("fecha", from)
       .lt("fecha", to)
       .order("fecha", { ascending: false }),
@@ -51,7 +51,7 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
 
   return (
     <>
-      <PageHeader icon={Clock} title="Registro de horas" subtitle="Lo que dedicas al semillero, día a día" />
+      <PageHeader icon={Clock} title="Registro de horas" subtitle="Lo que dedicas al semillero · las tareas validadas suman sus horas solas" />
 
       <div className="mb-6 flex items-center gap-2">
         <Link href={`/horas?mes=${shiftMonth(month, -1)}`} className="rounded-lg p-2 hover:bg-neutral-200" aria-label="Mes anterior"><ChevronLeft className="h-5 w-5" /></Link>
@@ -91,14 +91,21 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
                     <li key={e.id} className="flex items-center gap-3 p-4">
                       <span className="w-16 shrink-0 text-xs text-neutral-500">{new Date(e.fecha + "T12:00").toLocaleDateString("es-PE", { day: "numeric", month: "short" })}</span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm">{e.actividad}</p>
+                        <p className="text-sm">
+                          {e.origen === "tarea" && <span className="mr-1.5 inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">✅ Automática</span>}
+                          {e.actividad}
+                        </p>
                         {task && <Link href={`/tareas/${task.id}`} className="text-xs text-brand-600 hover:underline">{task.title}</Link>}
                       </div>
                       <span className="font-semibold">{fmtH(Number(e.horas))}</span>
-                      <form action={deleteHours}>
-                        <input type="hidden" name="id" value={e.id} />
-                        <button aria-label="Borrar" className="text-neutral-300 hover:text-brand-600"><Trash2 className="h-4 w-4" /></button>
-                      </form>
+                      {e.origen === "tarea" ? (
+                        <span className="w-4" title="Sumada al validar la tarea" />
+                      ) : (
+                        <form action={deleteHours}>
+                          <input type="hidden" name="id" value={e.id} />
+                          <button aria-label="Borrar" className="text-neutral-300 hover:text-brand-600"><Trash2 className="h-4 w-4" /></button>
+                        </form>
+                      )}
                     </li>
                   );
                 })}

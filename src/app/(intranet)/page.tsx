@@ -14,7 +14,7 @@ import { TEAM } from "@/data/eco-motors";
 import { upcomingEvents } from "@/lib/events";
 import { requireMe } from "@/lib/me";
 import { fmtHours, weeklyHours } from "@/lib/attendance";
-import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
+import { TASK_SELECT, mineFilter, participantTaskIds, type TaskRow } from "@/lib/tasks";
 import { unitPath } from "@/lib/units";
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
@@ -23,12 +23,13 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const { supabase, member, profile, units, isAdmin } = await requireMe();
   const branch = member ? unitPath(units, member.unit_id).map((u) => u.id) : ["-"];
 
+  const collab = await participantTaskIds(supabase, member?.id);
   const [news, people, events, myTasks, projects] = await Promise.all([
     supabase.from("announcements").select("id,title,body,created_at,image_url,unit:units(name)").order("created_at", { ascending: false }).limit(3),
     supabase.from("members").select("id,full_name,birthday,avatar_url,estado").eq("es_prueba", false).neq("estado", "Miembro retirado"),
     upcomingEvents(supabase, 14),
     member
-      ? supabase.from("tasks").select(TASK_SELECT).eq("assignee_id", member.id)
+      ? supabase.from("tasks").select(TASK_SELECT).or(mineFilter(member.id, collab))
           .not("estado", "in", "(Completada y validada,Cancelada)")
           .order("fecha_limite", { ascending: true, nullsFirst: false }).returns<TaskRow[]>()
       : Promise.resolve({ data: [] as TaskRow[] }),
