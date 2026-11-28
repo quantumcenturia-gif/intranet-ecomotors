@@ -56,7 +56,7 @@ export default async function DirectorioPage({ searchParams }: PageProps<"/direc
       {groups.map((g) => (
         <section key={g.area.id} className="mb-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500">{g.area.name}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {g.people.map((m) => (
               <Link key={m.id} href={`/directorio/${m.id}`} className="flex flex-col items-center rounded-xl border border-neutral-200 bg-white p-5 text-center transition hover:border-brand-300 hover:shadow-md">
                 <Avatar name={m.full_name} src={m.avatar_url} size={72} />

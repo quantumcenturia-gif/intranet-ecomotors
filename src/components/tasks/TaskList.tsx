@@ -9,17 +9,17 @@ import { PERMISO_ICON, RIESGO_STYLES, necesitaPermiso } from "@/lib/safety";
 export default function TaskList({ tasks, empty }: { tasks: TaskRow[]; empty: string }) {
   if (!tasks.length) return <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500">{empty}</p>;
   return (
-    <ul className="divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-200 bg-white">
+    <ul className="stagger divide-y divide-neutral-100 overflow-hidden rounded-xl border border-neutral-200 bg-white">
       {tasks.map((t) => {
         const estado = estadoVisible(t);
         const done = t.subtasks.filter((s) => s.estado === "Completada y validada").length;
         return (
           <li key={t.id}>
-            <Link href={`/tareas/${t.id}`} className="flex flex-col gap-2 p-4 hover:bg-neutral-50 sm:flex-row sm:items-center sm:gap-4">
+            <Link href={`/tareas/${t.id}`} className="group flex flex-col gap-2 p-4 transition hover:bg-neutral-50 sm:flex-row sm:items-center sm:gap-4">
               <div className="min-w-0 flex-1">
                 <p className="flex items-center gap-2 font-medium">
                   <span className={`text-xs font-bold ${PRIORIDAD_STYLES[t.prioridad]}`} title={`Prioridad ${t.prioridad}`}>●</span>
-                  <span className="truncate">{t.title}</span>
+                  <span className="truncate transition group-hover:text-brand-700">{t.title}</span>
                   {t.convocatoria && <Badge className="shrink-0 bg-brand-600 text-white">📣 Convocatoria</Badge>}
                   {t.horas ? <Badge className="shrink-0 bg-neutral-900 text-white">⏱ {fmtHoras(t.horas)}</Badge> : null}
                   {necesitaPermiso(t.riesgo) && (
@@ -43,7 +43,7 @@ export default function TaskList({ tasks, empty }: { tasks: TaskRow[]; empty: st
               </div>
               <div className="flex items-center gap-3">
                 <div className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-neutral-100 sm:block" title={`${t.avance}%`}>
-                  <div className="h-full bg-brand-600" style={{ width: `${t.avance}%` }} />
+                  <div className="grow-x h-full bg-brand-600" style={{ width: `${t.avance}%` }} />
                 </div>
                 <Badge className={ESTADO_STYLES[estado]}>{estado}</Badge>
                 {t.convocatoria && !t.assignee ? (

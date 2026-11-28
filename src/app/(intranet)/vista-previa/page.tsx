@@ -5,6 +5,7 @@ import { Label, btnPrimary, card, inputCls } from "@/components/ui";
 import { requireMe } from "@/lib/me";
 import { flattenTree } from "@/lib/units";
 import { startPreview, stopPreview } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const ROLES = [
   { rol: "Supervisor/a", desc: "Ve y gestiona toda su rama (p. ej. Mecánica con sus 3 subáreas): publica tareas y convocatorias, valida, abre asistencias y ve reportes." },
@@ -22,7 +23,7 @@ export default async function VistaPreviaPage() {
       {preview && (
         <form action={stopPreview} className={`${card} mb-6 flex flex-wrap items-center gap-3 border-l-4 border-l-brand-600 p-4`}>
           <p className="flex-1 text-sm">Ahora estás viendo la intranet como <b>{member?.rol}</b> de <b>{units.find((u) => u.id === member?.unit_id)?.name}</b>.</p>
-          <button className="rounded-lg bg-black px-4 py-2 text-sm text-white">Volver a mi cuenta</button>
+          <SubmitButton className="rounded-lg bg-black px-4 py-2 text-sm text-white">Volver a mi cuenta</SubmitButton>
         </form>
       )}
       <form action={startPreview} className={`${card} max-w-2xl space-y-5 p-6`}>
@@ -48,7 +49,7 @@ export default async function VistaPreviaPage() {
           Usa una ficha de prueba invisible para el resto del equipo. Lo que hagas en la vista previa (marcar asistencia, apuntarte a una
           convocatoria…) queda a nombre de «Vista previa» y se borra al salir.
         </p>
-        <button className={btnPrimary}><Eye className="h-4 w-4" /> Ver la intranet así</button>
+        <SubmitButton className={btnPrimary} pendingText="Cargando…"><Eye className="h-4 w-4" /> Ver la intranet así</SubmitButton>
       </form>
     </>
   );

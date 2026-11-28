@@ -10,6 +10,7 @@ import { card } from "@/components/ui";
 import { requireMe } from "@/lib/me";
 import { RUN_SELECT, SERIES_COLORS, bestByDay, dayShort, fmtLap, runStats, type PilotRun } from "@/lib/pilots";
 import { deleteRun } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function PilotosPage({ searchParams }: PageProps<"/pilotos">) {
   const sp = await searchParams;
@@ -75,7 +76,7 @@ export default async function PilotosPage({ searchParams }: PageProps<"/pilotos"
         )}
       </section>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {people.map((p, i) => {
           const mine = runs.filter((r) => r.piloto_id === p.id);
           const byDay = bestByDay(mine);
@@ -140,7 +141,7 @@ export default async function PilotosPage({ searchParams }: PageProps<"/pilotos"
                       <td>{r.peso_kg ? `${Number(r.peso_kg)} kg` : "—"}</td>
                       <td className="max-w-40 truncate">{r.traje ?? "—"}</td>
                       <td className="text-right">
-                        <form action={deleteRun}><input type="hidden" name="id" value={r.id} /><button aria-label="Borrar intento" className="text-neutral-300 hover:text-red-600"><Trash2 className="h-4 w-4" /></button></form>
+                        <form action={deleteRun}><input type="hidden" name="id" value={r.id} /><SubmitButton aria-label="Borrar intento" className="text-neutral-300 hover:text-red-600"><Trash2 className="h-4 w-4" /></SubmitButton></form>
                       </td>
                     </tr>
                   );

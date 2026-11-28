@@ -15,6 +15,7 @@ import {
   addComment, decideVolunteer, deleteEvidence, deleteTask, downloadEvidence, reviewTask, unvolunteer, updateProgress, updateTask, uploadEvidence, volunteer,
 } from "../actions";
 import { subtree } from "@/lib/units";
+import SubmitButton from "@/components/SubmitButton";
 
 type Person = { id: string; full_name: string; avatar_url: string | null } | null;
 
@@ -104,7 +105,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                 <span>{task.avance}%</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
-                <div className="h-full bg-brand-600 transition-all" style={{ width: `${task.avance}%` }} />
+                <div className="grow-x h-full bg-brand-600 transition-all" style={{ width: `${task.avance}%` }} />
               </div>
             </div>
           </section>
@@ -126,13 +127,13 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                 <form action={volunteer} className="flex flex-col gap-2 rounded-lg bg-brand-50 p-4 sm:flex-row">
                   <input type="hidden" name="id" value={task.id} />
                   <input name="nota" placeholder="Comentario opcional (p. ej. «Tengo experiencia en soldadura»)" className={inputCls} />
-                  <button className={`${btnPrimary} whitespace-nowrap`}>🙋 Yo lo voy a hacer</button>
+                  <SubmitButton className={`${btnPrimary} whitespace-nowrap`}>🙋 Yo lo voy a hacer</SubmitButton>
                 </form>
               )}
               {myVol && (
                 <div className="flex flex-wrap items-center gap-3 rounded-lg bg-neutral-50 p-4 text-sm">
                   {myVol.estado === "Pendiente" && <>Te apuntaste. Esperando la respuesta de quien publicó la tarea.
-                    <form action={unvolunteer}><input type="hidden" name="id" value={task.id} /><button className="text-brand-600 hover:underline">Retirarme</button></form></>}
+                    <form action={unvolunteer}><input type="hidden" name="id" value={task.id} /><SubmitButton className="text-brand-600 hover:underline">Retirarme</SubmitButton></form></>}
                   {myVol.estado === "Aceptado" && <>✅ Te aceptaron: tienes tu subtarea abajo, en «Subtareas».</>}
                   {myVol.estado === "Rechazado" && <>No fuiste seleccionado/a esta vez.</>}
                 </div>
@@ -154,11 +155,11 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                             <div className="flex gap-2">
                               <form action={decideVolunteer}>
                                 <input type="hidden" name="id" value={task.id} /><input type="hidden" name="volunteer_id" value={v.id} /><input type="hidden" name="accept" value="1" />
-                                <button className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-700">Aceptar</button>
+                                <SubmitButton className="rounded-md bg-brand-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-700">Aceptar</SubmitButton>
                               </form>
                               <form action={decideVolunteer}>
                                 <input type="hidden" name="id" value={task.id} /><input type="hidden" name="volunteer_id" value={v.id} /><input type="hidden" name="accept" value="0" />
-                                <button className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs hover:bg-neutral-50">Rechazar</button>
+                                <SubmitButton className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs hover:bg-neutral-50">Rechazar</SubmitButton>
                               </form>
                             </div>
                           ) : (
@@ -244,7 +245,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                   <textarea name="entrega_nota" rows={2} defaultValue={task.entrega_nota ?? ""} className={inputCls} />
                 </Label>
                 <div>
-                  <button className={btnPrimary}>Guardar avance</button>
+                  <SubmitButton className={btnPrimary}>Guardar avance</SubmitButton>
                 </div>
               </form>
               )}
@@ -272,13 +273,13 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                     <form action={downloadEvidence}>
                       <input type="hidden" name="path" value={f.path} />
                       <input type="hidden" name="name" value={f.name} />
-                      <button aria-label="Descargar" className="text-neutral-500 hover:text-brand-600"><Download className="h-4 w-4" /></button>
+                      <SubmitButton aria-label="Descargar" className="text-neutral-500 hover:text-brand-600"><Download className="h-4 w-4" /></SubmitButton>
                     </form>
                     {(canManage || f.uploaded_by === member?.id) && (
                       <form action={deleteEvidence}>
                         <input type="hidden" name="id" value={task.id} />
                         <input type="hidden" name="path" value={f.path} />
-                        <button aria-label="Borrar" className="text-neutral-400 hover:text-brand-600"><Trash2 className="h-4 w-4" /></button>
+                        <SubmitButton aria-label="Borrar" className="text-neutral-400 hover:text-brand-600"><Trash2 className="h-4 w-4" /></SubmitButton>
                       </form>
                     )}
                   </li>
@@ -291,7 +292,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <form action={uploadEvidence} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input type="hidden" name="id" value={task.id} />
                 <input name="file" type="file" required className="flex-1 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-2" />
-                <button className={btnDark}><Upload className="h-4 w-4" /> Subir</button>
+                <SubmitButton className={btnDark}><Upload className="h-4 w-4" /> Subir</SubmitButton>
               </form>
             )}
           </section>
@@ -323,7 +324,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <form action={addComment} className="flex gap-2">
                 <input type="hidden" name="id" value={task.id} />
                 <input name="body" required placeholder="Escribe un comentario…" className={inputCls} />
-                <button className={btnDark} aria-label="Enviar"><Send className="h-4 w-4" /></button>
+                <SubmitButton className={btnDark} aria-label="Enviar"><Send className="h-4 w-4" /></SubmitButton>
               </form>
             )}
           </section>
@@ -408,7 +409,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                     </Label>
                   )}
                   <textarea name="resultado_revision" rows={3} placeholder="Comentario de la revisión…" className={inputCls} />
-                  <button className={`${btnPrimary} w-full`}>Guardar revisión</button>
+                  <SubmitButton className={`${btnPrimary} w-full`}>Guardar revisión</SubmitButton>
                 </form>
               )}
             </section>
@@ -422,14 +423,14 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <form key={`e-${task.updated_at}`} action={updateTask} className="mt-4 space-y-4 [&_.sm\:grid-cols-2]:grid-cols-1">
                 <input type="hidden" name="id" value={task.id} />
                 <TaskFields task={task} units={units} manageable={manageable} members={members ?? []} projects={projects ?? []} canAssign participantIds={collaborators.map((c) => c.id)} />
-                <button className={`${btnDark} w-full`}>Guardar cambios</button>
+                <SubmitButton className={`${btnDark} w-full`}>Guardar cambios</SubmitButton>
               </form>
               <form action={deleteTask} className="mt-3">
                 <input type="hidden" name="id" value={task.id} />
                 <input type="hidden" name="parent_id" value={task.parent_id ?? ""} />
-                <button className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm text-brand-600 hover:bg-brand-50">
+                <SubmitButton className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm text-brand-600 hover:bg-brand-50">
                   <Trash2 className="h-4 w-4" /> Eliminar tarea y subtareas
-                </button>
+                </SubmitButton>
               </form>
             </details>
           )}

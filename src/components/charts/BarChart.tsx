@@ -38,7 +38,7 @@ export default function BarChart({
                 {d.value ? `${d.value}${unit}` : ""}
               </span>
               <div
-                className="w-full max-w-6 rounded-t transition-[opacity,height] duration-500"
+                className="grow-y w-full max-w-6 rounded-t transition-[opacity,height] duration-500"
                 style={{ height: h, background: color, opacity: hover === null || hover === i ? 1 : 0.45 }}
               />
               <div className="h-px w-full bg-neutral-200" />

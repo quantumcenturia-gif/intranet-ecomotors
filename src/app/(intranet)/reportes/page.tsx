@@ -10,6 +10,7 @@ import { SESSION_STYLES, TIPO_STYLES, dayLabel, fmtHours, hhmm } from "@/lib/att
 import { requireMe } from "@/lib/me";
 import { buildReport, parseParams } from "@/lib/report";
 import { flattenTree } from "@/lib/units";
+import SubmitButton from "@/components/SubmitButton";
 
 const fmtDate = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("es-PE", { day: "numeric", month: "long", year: "numeric" });
 
@@ -72,7 +73,7 @@ export default async function ReportesPage({ searchParams }: PageProps<"/reporte
         )}
         <Label label="Desde"><input type="date" name="desde" defaultValue={p.desde} className={inputCls} /></Label>
         <Label label="Hasta"><input type="date" name="hasta" defaultValue={p.hasta} className={inputCls} /></Label>
-        <button className={btnDark}>Ver reporte</button>
+        <SubmitButton className={btnDark}>Ver reporte</SubmitButton>
         <div className="flex flex-wrap items-center gap-2 md:col-span-5">
           <span className="text-xs text-neutral-500">Periodos rápidos:</span>
           {periods().map((x) => (

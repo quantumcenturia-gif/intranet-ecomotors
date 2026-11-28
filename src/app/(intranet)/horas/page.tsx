@@ -7,6 +7,7 @@ import { Label, btnPrimary, card, inputCls } from "@/components/ui";
 import { requireMe } from "@/lib/me";
 import { monthRange, shiftMonth, todayLima } from "@/lib/months";
 import { addHours, deleteHours } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const fmtH = (n: number) => `${Number(n.toFixed(2))} h`;
 
@@ -72,7 +73,7 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
                 </select>
               </Label>
               <Label label="¿Qué hiciste?" className="sm:col-span-3"><input name="actividad" required placeholder="Ej. Soldadura de soportes en taller" className={inputCls} /></Label>
-              <div><button className={btnPrimary}><Plus className="h-4 w-4" /> Registrar</button></div>
+              <div><SubmitButton className={btnPrimary}><Plus className="h-4 w-4" /> Registrar</SubmitButton></div>
             </form>
           ) : (
             <p className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800">Tu cuenta aún no está vinculada a tu ficha. Pide a coordinación que añada tu correo.</p>
@@ -103,7 +104,7 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
                       ) : (
                         <form action={deleteHours}>
                           <input type="hidden" name="id" value={e.id} />
-                          <button aria-label="Borrar" className="text-neutral-300 hover:text-brand-600"><Trash2 className="h-4 w-4" /></button>
+                          <SubmitButton aria-label="Borrar" className="text-neutral-300 hover:text-brand-600"><Trash2 className="h-4 w-4" /></SubmitButton>
                         </form>
                       )}
                     </li>
@@ -121,7 +122,7 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
             <h2 className="mb-1 font-semibold">Horas de mi equipo</h2>
             <p className="mb-4 text-xs text-neutral-500">Total del mes por persona</p>
             {teamRows.length ? (
-              <ul className="space-y-3">
+              <ul className="stagger space-y-3">
                 {teamRows.map((r) => (
                   <li key={r.name}>
                     <div className="flex items-center gap-2">
@@ -133,7 +134,7 @@ export default async function HorasPage({ searchParams }: PageProps<"/horas">) {
                       <span className="text-sm font-semibold">{fmtH(r.total)}</span>
                     </div>
                     <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-neutral-100">
-                      <div className="h-full bg-brand-600" style={{ width: `${(r.total / maxTeam) * 100}%` }} />
+                      <div className="grow-x h-full bg-brand-600" style={{ width: `${(r.total / maxTeam) * 100}%` }} />
                     </div>
                   </li>
                 ))}

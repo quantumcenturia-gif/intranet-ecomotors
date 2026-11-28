@@ -89,7 +89,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       )}
       {pwOk && <p className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">✅ Tu contraseña se ha cambiado correctamente.</p>}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="stagger mb-6 grid gap-4 sm:grid-cols-3">
         <Stat href="/tareas" icon={ListChecks} value={myTasks.data?.length ?? 0} label="Mis tareas abiertas" />
         {isAdmin ? (
           <Stat href="/directorio" icon={Users} value={activos} label="Integrantes activos" />

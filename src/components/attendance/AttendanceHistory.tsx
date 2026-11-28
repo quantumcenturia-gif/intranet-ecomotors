@@ -37,7 +37,7 @@ export default function AttendanceHistory({ rows, title = "Mi asistencia" }: { r
             return (
               <div key={w.week} className="flex flex-1 flex-col items-center gap-1" title={`${w.label}: ${fmtHours(h)}`}>
                 <span className="text-[10px] text-neutral-500">{h ? Number(h.toFixed(1)) : ""}</span>
-                <div className="flex w-full flex-col justify-end overflow-hidden rounded-t" style={{ height: `${(h / max) * 80}px` }}>
+                <div className="grow-y flex w-full flex-col justify-end overflow-hidden rounded-t" style={{ height: `${(h / max) * 80}px` }}>
                   {w.pendientes > 0 && <div className="bg-brand-200" style={{ height: `${(w.pendientes / h) * 100}%` }} />}
                   {w.verificadas > 0 && <div className="bg-brand-600" style={{ height: `${(w.verificadas / h) * 100}%` }} />}
                 </div>

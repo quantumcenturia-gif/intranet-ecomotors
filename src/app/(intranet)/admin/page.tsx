@@ -10,6 +10,7 @@ import { flattenTree } from "@/lib/units";
 
 type Tree = ReturnType<typeof flattenTree>;
 import { runNotionImport, saveMember } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const sel = "rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-xs";
 
@@ -42,7 +43,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
             Copia los integrantes (subárea, rol y estado) y el calendario desde Notion. Actualiza los que ya existen y no borra
             correos, fotos ni tareas creadas aquí.
           </p>
-          <form action={runNotionImport}><button className={btnDark}><DownloadCloud className="h-4 w-4" /> Importar desde Notion</button></form>
+          <form action={runNotionImport}><SubmitButton className={btnDark}><DownloadCloud className="h-4 w-4" /> Importar desde Notion</SubmitButton></form>
         </section>
         <section className={`${card} p-5`}>
           <h2 className="mb-1 flex items-center gap-2 font-semibold"><Link2 className="h-5 w-5 text-brand-600" /> Cuentas vinculadas</h2>
@@ -65,7 +66,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
           <input name="email" type="email" placeholder="correo@uni.pe" className={inputCls} />
           <UnitSelect tree={tree} />
           <Opt name="rol" value="Integrante" list={ROLES} />
-          <button className={btnPrimary}><UserPlus className="h-4 w-4" /> Añadir</button>
+          <SubmitButton className={btnPrimary}><UserPlus className="h-4 w-4" /> Añadir</SubmitButton>
         </form>
       </section>
 
@@ -88,7 +89,7 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
               <Opt name="rol" value={m.rol} list={ROLES} />
               <Opt name="estado" value={m.estado} list={ESTADOS_MIEMBRO} />
               <Opt name="condicion" value={m.condicion} list={CONDICIONES} />
-              <button className="rounded-md bg-black p-1.5 text-white hover:bg-neutral-800" aria-label="Guardar"><Save className="h-4 w-4" /></button>
+              <SubmitButton className="rounded-md bg-black p-1.5 text-white hover:bg-neutral-800" aria-label="Guardar"><Save className="h-4 w-4" /></SubmitButton>
             </form>
           ))}
           {!members.length && <p className="p-5 text-sm text-neutral-500">No hay integrantes. Usa «Importar desde Notion» o añade uno.</p>}

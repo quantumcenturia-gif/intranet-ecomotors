@@ -5,6 +5,7 @@ import { formatDate, formatSize } from "@/lib/format";
 import { requireMe } from "@/lib/me";
 import { flattenTree, subtree } from "@/lib/units";
 import { deleteDocument, downloadDocument, uploadDocument } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 const CATEGORIAS = ["Entregable", "Recurso", "Reglamento", "Plantilla", "Otro"] as const;
 const CAT_STYLES: Record<string, string> = {
@@ -46,9 +47,9 @@ export default async function DocumentosPage({ searchParams }: PageProps<"/docum
         <select name="categoria" defaultValue="Entregable" className={selectSm}>
           {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
         </select>
-        <button className="flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
+        <SubmitButton className="flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">
           <Upload className="h-4 w-4" /> Subir
-        </button>
+        </SubmitButton>
       </form>
 
       <form className="mb-4 flex flex-wrap items-center gap-2">
@@ -60,12 +61,12 @@ export default async function DocumentosPage({ searchParams }: PageProps<"/docum
           <option value="">Todos los tipos</option>
           {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
         </select>
-        <button className="rounded-lg bg-black px-3 py-2 text-sm text-white">Filtrar</button>
+        <SubmitButton className="rounded-lg bg-black px-3 py-2 text-sm text-white">Filtrar</SubmitButton>
       </form>
 
       <div className={`${card} overflow-hidden`}>
         {docs?.length ? (
-          <ul className="divide-y divide-neutral-100">
+          <ul className="stagger divide-y divide-neutral-100">
             {docs.map((d) => {
               const uploader = Array.isArray(d.uploader) ? d.uploader[0] : d.uploader;
               return (
@@ -82,12 +83,12 @@ export default async function DocumentosPage({ searchParams }: PageProps<"/docum
                   <form action={downloadDocument}>
                     <input type="hidden" name="path" value={d.path} />
                     <input type="hidden" name="name" value={d.name} />
-                    <button aria-label="Descargar" className="text-neutral-500 hover:text-brand-600"><Download className="h-5 w-5" /></button>
+                    <SubmitButton aria-label="Descargar" className="text-neutral-500 hover:text-brand-600"><Download className="h-5 w-5" /></SubmitButton>
                   </form>
                   {(isAdmin || d.uploaded_by === user.id) && (
                     <form action={deleteDocument}>
                       <input type="hidden" name="path" value={d.path} />
-                      <button aria-label="Borrar" className="text-neutral-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></button>
+                      <SubmitButton aria-label="Borrar" className="text-neutral-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></SubmitButton>
                     </form>
                   )}
                 </li>

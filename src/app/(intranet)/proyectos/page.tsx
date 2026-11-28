@@ -5,6 +5,7 @@ import PageHeader from "@/components/PageHeader";
 import { btnDark, card, inputCls } from "@/components/ui";
 import { requireMe } from "@/lib/me";
 import { updateProject } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function ProyectosPage() {
   const { supabase, isAdmin } = await requireMe();
@@ -16,7 +17,7 @@ export default async function ProyectosPage() {
   return (
     <>
       <PageHeader icon={Rocket} title="Proyectos" subtitle="Lo que construimos en Eco Motors" />
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="stagger grid gap-6 sm:grid-cols-2">
         {projects?.map((p) => {
           const pt = tasks?.filter((t) => t.project_id === p.id) ?? [];
           const open = pt.filter((t) => !["Completada y validada", "Cancelada"].includes(t.estado)).length;
@@ -44,7 +45,7 @@ export default async function ProyectosPage() {
                       <input type="hidden" name="id" value={p.id} />
                       <textarea name="description" rows={3} defaultValue={p.description ?? ""} className={inputCls} />
                       <input name="image" type="file" accept="image/*" className="text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-2" />
-                      <button className={btnDark}>Guardar</button>
+                      <SubmitButton className={btnDark}>Guardar</SubmitButton>
                     </form>
                   </details>
                 )}

@@ -5,6 +5,7 @@ import { Save } from "lucide-react";
 import { Label, btnPrimary, inputCls } from "@/components/ui";
 import { fmtLap, parseLaps, runStats, TRAJES_SUGERIDOS } from "@/lib/pilots";
 import { createRun } from "@/app/(intranet)/pilotos/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 type Opt = { id: string; name: string };
 
@@ -91,9 +92,9 @@ export default function RunForm({
         <input name="notas" placeholder="Clima, presión de llantas, incidencias…" className={inputCls} />
       </Label>
       <div className="flex items-end">
-        <button className={`${btnPrimary} w-full`} disabled={!!parsed.error || !stats.count}>
+        <SubmitButton className={`${btnPrimary} w-full`} disabled={!!parsed.error || !stats.count}>
           <Save className="h-4 w-4" /> Guardar intento
-        </button>
+        </SubmitButton>
       </div>
     </form>
   );

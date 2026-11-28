@@ -7,6 +7,7 @@ import { TASK_ESTADOS, estadoVisible } from "@/data/eco-motors";
 import { requireMe } from "@/lib/me";
 import { TASK_SELECT, mineFilter, participantTaskIds, type TaskRow } from "@/lib/tasks";
 import { flattenTree, subtree, unitPath } from "@/lib/units";
+import SubmitButton from "@/components/SubmitButton";
 
 const OPEN = (t: TaskRow) => !["Completada y validada", "Cancelada"].includes(t.estado);
 
@@ -39,7 +40,7 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
     .in("unit_id", myBranch.length ? myBranch : ["-"]);
 
   const tab = (v: string, label: string, badge?: number) => (
-    <Link href={`/tareas?vista=${v}`} className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium ${vista === v ? "bg-black text-white" : "text-neutral-600 hover:bg-neutral-200"}`}>
+    <Link href={`/tareas?vista=${v}`} className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition duration-200 active:scale-95 ${vista === v ? "bg-black text-white shadow-md" : "text-neutral-600 hover:bg-neutral-200"}`}>
       {label}
       {!!badge && <span className="rounded-full bg-brand-600 px-1.5 text-xs text-white">{badge}</span>}
     </Link>
@@ -91,7 +92,7 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
             <option value="">Abiertas</option>
             {[...TASK_ESTADOS, "Atrasada"].map((e) => <option key={e}>{e}</option>)}
           </select>
-          <button className="rounded-lg bg-black px-3 py-2 text-sm text-white">Filtrar</button>
+          <SubmitButton className="rounded-lg bg-black px-3 py-2 text-sm text-white">Filtrar</SubmitButton>
         </form>
       </div>
 
@@ -106,13 +107,13 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
       )}
 
       {vista === "areas" ? (
-        <div className="space-y-3">
+        <div className="stagger space-y-3">
           {treeUnits.map(({ unit, depth }) => {
             const c = countIn(unit.id);
             const own = byUnit.get(unit.id) ?? [];
             return (
               <details key={unit.id} open={depth === 0 || own.length > 0} style={{ marginLeft: depth * 20 }} className="group rounded-xl border border-neutral-200 bg-white">
-                <summary className="flex cursor-pointer list-none items-center gap-3 p-4">
+                <summary className="no-chevron flex cursor-pointer list-none items-center gap-3 rounded-xl p-4 transition hover:bg-neutral-50">
                   <ChevronDown className="h-4 w-4 text-neutral-400 transition group-open:rotate-0 -rotate-90" />
                   <span className={`font-semibold ${depth === 0 ? "text-base" : "text-sm"}`}>{unit.name}</span>
                   <span className="text-xs text-neutral-400">{unit.kind === "area" ? "Área" : unit.kind === "supervision" ? "Supervisión" : "Subárea"}</span>

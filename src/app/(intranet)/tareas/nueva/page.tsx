@@ -5,6 +5,7 @@ import TaskFields from "@/components/tasks/TaskFields";
 import { Label, btnPrimary, card, inputCls } from "@/components/ui";
 import { requireMe } from "@/lib/me";
 import { createTask } from "../actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function NuevaTareaPage({ searchParams }: PageProps<"/tareas/nueva">) {
   const sp = await searchParams;
@@ -67,9 +68,9 @@ export default async function NuevaTareaPage({ searchParams }: PageProps<"/tarea
           defaultConvocatoria={!parent}
         />
 
-        <button className={btnPrimary}>
+        <SubmitButton className={btnPrimary}>
           <Plus className="h-4 w-4" /> Crear tarea
-        </button>
+        </SubmitButton>
       </form>
     </>
   );

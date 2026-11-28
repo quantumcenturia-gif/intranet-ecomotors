@@ -36,10 +36,10 @@ export default function ActionError() {
 
   if (!shown) return null;
   return (
-    <div role="alert" className="mb-4 flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 text-sm text-brand-900 print:hidden">
+    <div role="alert" className="mb-4 flex animate-rise items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-3 text-sm text-brand-900 shadow-sm print:hidden">
       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
       <p className="flex-1">{shown}</p>
-      <button type="button" onClick={() => setShown(null)} aria-label="Cerrar" className="text-brand-700 hover:text-brand-900">
+      <button type="button" onClick={() => setShown(null)} aria-label="Cerrar" className="rounded p-0.5 text-brand-700 transition hover:bg-brand-100 hover:text-brand-900">
         <X className="h-4 w-4" />
       </button>
     </div>

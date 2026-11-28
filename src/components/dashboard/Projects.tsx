@@ -15,7 +15,7 @@ export default function Projects({ projects }: { projects: Project[] }) {
           Ver todos <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {projects.map((p) => (
           <Link key={p.id} href="/proyectos" className="overflow-hidden rounded-lg border border-neutral-100 transition hover:border-brand-200 hover:shadow">
             <div className="flex h-20 items-center justify-center bg-black">
