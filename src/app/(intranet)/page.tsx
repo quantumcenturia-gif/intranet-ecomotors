@@ -20,7 +20,7 @@ import { unitPath } from "@/lib/units";
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   await connection();
   const pwOk = (await searchParams).pw === "ok";
-  const { supabase, member, profile, units, isAdmin } = await requireMe();
+  const { supabase, member, profile, units, isAdmin, isSafety } = await requireMe();
   const branch = member ? unitPath(units, member.unit_id).map((u) => u.id) : ["-"];
 
   const collab = await participantTaskIds(supabase, member?.id);
@@ -50,6 +50,10 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const { data: att } = !isAdmin && member
     ? await supabase.from("attendance_records").select("horas,session:attendance_sessions(fecha,estado)").eq("member_id", member.id).order("id", { ascending: false }).limit(40)
     : { data: [] };
+  // Seguridad: trabajos de riesgo esperando aprobación
+  const { count: porAprobar } = isSafety
+    ? await supabase.from("tasks").select("id", { count: "exact", head: true }).eq("seguridad_estado", "Pendiente")
+    : { count: 0 };
   // Los pilotos ven sus tiempos en el inicio
   const isPilot = member?.unit_id === "pilotos";
   const { data: pilotRuns } = isPilot
@@ -74,6 +78,13 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             <p className="truncate text-sm text-neutral-600">{pendientes.map((c) => c.title).join(" · ")}</p>
           </div>
           <span className="text-sm font-medium text-brand-700">Ver y apuntarme →</span>
+        </Link>
+      )}
+      {!!porAprobar && (
+        <Link href="/seguridad?vista=aprobar" className="mb-4 flex items-center gap-3 rounded-xl border-l-4 border-amber-500 bg-amber-50 p-4 hover:bg-amber-100">
+          <span className="inline-block text-2xl animate-wiggle-slow">🦺</span>
+          <p className="flex-1 font-semibold">{porAprobar === 1 ? "Hay 1 trabajo de riesgo esperando la aprobación de Seguridad" : `Hay ${porAprobar} trabajos de riesgo esperando la aprobación de Seguridad`}</p>
+          <span className="text-sm font-medium text-amber-800">Revisar →</span>
         </Link>
       )}
       {pwOk && <p className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">✅ Tu contraseña se ha cambiado correctamente.</p>}

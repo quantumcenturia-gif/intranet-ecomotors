@@ -56,7 +56,9 @@ export const getMe = cache(async () => {
       : [...(member && MANAGER_ROLES.includes(member.rol) ? subtree(allUnits, member.unit_id) : []), ...led],
   );
   const preview = !!member?.es_prueba;
-  return { supabase, user, profile, member, units: allUnits, isAdmin, isManager, manageable, realAdmin, preview };
+  // Seguridad = quien dirige el área de Seguridad (y coordinación)
+  const isSafety = manageable.has("seguridad");
+  return { supabase, user, profile, member, units: allUnits, isAdmin, isManager, manageable, realAdmin, preview, isSafety };
 });
 
 export async function requireMe() {

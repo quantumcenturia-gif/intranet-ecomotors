@@ -4,11 +4,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, Bell, Eye, Timer, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
+import { BarChart3, Bell, Eye, HardHat, Timer, FileBarChart, CalendarDays, ClipboardCheck, Clock, FileText, Home, ListChecks, LogOut, Megaphone, Menu, Rocket, Shield, User, Users, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/tareas", label: "Tareas", icon: ListChecks },
+  { href: "/seguridad", label: "Seguridad", icon: HardHat },
   { href: "/asistencia", label: "Asistencia", icon: ClipboardCheck },
   { href: "/horas", label: "Horas", icon: Clock },
   { href: "/avisos", label: "Avisos", icon: Bell },

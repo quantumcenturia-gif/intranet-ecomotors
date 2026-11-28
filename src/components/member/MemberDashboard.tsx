@@ -43,6 +43,14 @@ export default async function MemberDashboard({
     supabase.from("time_entries").select("horas").eq("member_id", m.id).eq("origen", "tarea"),
   ]);
   const horasTareas = (taskHours ?? []).reduce((a, r) => a + Number(r.horas), 0);
+  // Fichas de seguridad obligatorias que aún no leyó (solo en su propio espacio)
+  const [{ data: obligatorias }, { data: leidas }] = isSelf
+    ? await Promise.all([
+        supabase.from("safety_sheets").select("id").eq("publicada", true).eq("obligatoria", true),
+        supabase.from("safety_reads").select("sheet_id").eq("member_id", m.id),
+      ])
+    : [{ data: [] as { id: number }[] }, { data: [] as { sheet_id: number }[] }];
+  const fichasPendientes = (obligatorias ?? []).filter((f) => !(leidas ?? []).some((l) => l.sheet_id === f.id)).length;
 
   const tasks = tasksData ?? [];
   const open = tasks.filter((t) => !CLOSED.includes(t.estado));
@@ -72,6 +80,13 @@ export default async function MemberDashboard({
 
   return (
     <div className="space-y-6">
+      {fichasPendientes > 0 && (
+        <Link href="/seguridad?vista=fichas" className="flex items-center gap-3 rounded-xl border-l-4 border-amber-500 bg-amber-50 p-4 hover:bg-amber-100">
+          <span className="text-2xl">🦺</span>
+          <p className="flex-1 font-semibold">Tienes {fichasPendientes} ficha{fichasPendientes > 1 ? "s" : ""} de seguridad por leer</p>
+          <span className="text-sm font-medium text-amber-800">Leer →</span>
+        </Link>
+      )}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Kpi icon={ListChecks} label="Tareas abiertas" value={String(open.length)} sub={late.length ? `${late.length} atrasada${late.length > 1 ? "s" : ""}` : "Ninguna atrasada"} warn={late.length > 0} />
         <Kpi icon={CheckCircle2} label="Tareas completadas" value={String(done.length)} sub={horasTareas ? `+${fmtHoras(horasTareas)} reconocidas` : `${perMonth.at(-1)!.value} este mes`} />

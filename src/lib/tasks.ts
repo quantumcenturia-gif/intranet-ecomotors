@@ -24,6 +24,16 @@ export type Task = {
   updated_at: string;
   convocatoria: boolean;
   horas: number | null;
+  riesgo: string;
+  peligros: string[];
+  epp: string[];
+  trabajo_inicio: string | null;
+  trabajo_fin: string | null;
+  trabajo_lugar: string | null;
+  seguridad_estado: string;
+  seguridad_obs: string | null;
+  seguridad_por: string | null;
+  seguridad_at: string | null;
 };
 
 export const TASK_SELECT =

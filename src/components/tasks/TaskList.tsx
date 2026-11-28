@@ -4,6 +4,7 @@ import Avatar from "@/components/Avatar";
 import { Badge } from "@/components/ui";
 import { ESTADO_STYLES, PRIORIDAD_STYLES, estadoVisible } from "@/data/eco-motors";
 import { fmtHoras, formatShortDate, type TaskRow } from "@/lib/tasks";
+import { PERMISO_ICON, RIESGO_STYLES, necesitaPermiso } from "@/lib/safety";
 
 export default function TaskList({ tasks, empty }: { tasks: TaskRow[]; empty: string }) {
   if (!tasks.length) return <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500">{empty}</p>;
@@ -21,6 +22,11 @@ export default function TaskList({ tasks, empty }: { tasks: TaskRow[]; empty: st
                   <span className="truncate">{t.title}</span>
                   {t.convocatoria && <Badge className="shrink-0 bg-brand-600 text-white">📣 Convocatoria</Badge>}
                   {t.horas ? <Badge className="shrink-0 bg-neutral-900 text-white">⏱ {fmtHoras(t.horas)}</Badge> : null}
+                  {necesitaPermiso(t.riesgo) && (
+                    <Badge className={`shrink-0 ${RIESGO_STYLES[t.riesgo]}`}>
+                      🦺 {t.riesgo} {PERMISO_ICON[t.seguridad_estado]}
+                    </Badge>
+                  )}
                 </p>
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500">
                   <span>{t.unit?.name}</span>

@@ -4,6 +4,7 @@ import { CalendarClock, CheckCircle2, ChevronRight, Download, FileText, FolderKa
 import Avatar from "@/components/Avatar";
 import TaskFields from "@/components/tasks/TaskFields";
 import TaskList from "@/components/tasks/TaskList";
+import SafetyPanel from "@/components/tasks/SafetyPanel";
 import { Badge, Label, btnDark, btnGhost, btnPrimary, card, inputCls } from "@/components/ui";
 import { ESTADO_STYLES, PRIORIDAD_STYLES, estadoVisible } from "@/data/eco-motors";
 import { formatSize } from "@/lib/format";
@@ -19,7 +20,7 @@ type Person = { id: string; full_name: string; avatar_url: string | null } | nul
 
 export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
   const id = Number((await params).id);
-  const { supabase, member, units, manageable } = await requireMe();
+  const { supabase, member, units, manageable, isSafety } = await requireMe();
 
   const { data: task, error } = await supabase
     .from("tasks")
@@ -51,6 +52,9 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
   const volunteers = (vols ?? []) as unknown as Vol[];
 
   const canManage = manageable.has(task.unit_id);
+  const { data: approver } = task.seguridad_por
+    ? await supabase.from("members").select("full_name").eq("id", task.seguridad_por).maybeSingle()
+    : { data: null };
   const collaborators = (task.participants ?? []).map((p) => p.member).filter((x): x is NonNullable<typeof x> => !!x);
   const involved = [task.assignee, ...collaborators].filter(Boolean).length;
   const validated = task.estado === "Completada y validada";
@@ -104,6 +108,8 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               </div>
             </div>
           </section>
+
+          <SafetyPanel task={task} isSafety={isSafety} approver={approver?.full_name} />
 
           {/* Convocatoria */}
           {task.convocatoria && (
@@ -190,6 +196,11 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
               <h2 className="mb-4 flex items-center gap-2 font-semibold">
                 <Send className="h-5 w-5 text-brand-600" /> Mi entrega
               </h2>
+              {["Pendiente", "Rechazada"].includes(task.seguridad_estado) && (
+                <p className="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                  🦺 {task.seguridad_estado === "Pendiente" ? "Espera la aprobación de Seguridad antes de empezar este trabajo." : "Seguridad detuvo este trabajo; revisa el motivo arriba."}
+                </p>
+              )}
               {(member?.drive_url || units.find((u) => u.id === task.unit_id)?.drive_url) && (
                 <div className="mb-4 flex flex-wrap gap-2 rounded-lg bg-neutral-50 p-3 text-sm">
                   <span className="w-full text-xs text-neutral-500">1) Sube tus archivos a Drive · 2) copia el enlace del archivo o carpeta y pégalo abajo · 3) envía a revisión</span>
