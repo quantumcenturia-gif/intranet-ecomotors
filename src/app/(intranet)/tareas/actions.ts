@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireMe, requireWriter } from "@/lib/me";
 import { failBack } from "@/lib/action-error";
+import { fromLimaInput, necesitaPermiso, riesgoMinimo } from "@/lib/safety";
 
 const str = (f: FormData, k: string) => {
   const v = f.get(k);
@@ -16,6 +17,19 @@ const horasOf = (f: FormData) => {
   const n = Number(v.replace(",", "."));
   return n > 0 && n <= 500 ? n : null;
 };
+
+/** Datos de seguridad del formulario (el riesgo nunca queda por debajo de lo que exigen los peligros). */
+async function safetyOf(f: FormData) {
+  const peligros = f.getAll("peligros").map(String).filter(Boolean);
+  const riesgo = riesgoMinimo(str(f, "riesgo") ?? "Bajo", peligros);
+  const trabajo_inicio = fromLimaInput(str(f, "trabajo_inicio"));
+  const trabajo_fin = fromLimaInput(str(f, "trabajo_fin"));
+  const trabajo_lugar = str(f, "trabajo_lugar");
+  if (necesitaPermiso(riesgo) && (!trabajo_inicio || !trabajo_lugar))
+    await failBack(`Es un trabajo de riesgo ${riesgo.toLowerCase()}: indica la fecha y hora de inicio y el lugar para que Seguridad pueda aprobarlo.`);
+  if (trabajo_inicio && trabajo_fin && trabajo_fin <= trabajo_inicio) await failBack("El fin del trabajo debe ser después del inicio.");
+  return { riesgo, peligros, epp: f.getAll("epp").map(String).filter(Boolean), trabajo_inicio, trabajo_fin, trabajo_lugar };
+}
 
 /** Deja la lista de colaboradores igual a la elegida en el formulario (sin repetir al responsable). */
 async function syncParticipants(supabase: Awaited<ReturnType<typeof requireWriter>>["supabase"], taskId: number, f: FormData, assignee: string | null, by: string | null) {
@@ -54,6 +68,7 @@ export async function createTask(formData: FormData) {
       prioridad: str(formData, "prioridad") ?? "MEDIA",
       fecha_limite: str(formData, "fecha_limite"),
       horas: isManager ? horasOf(formData) : null,
+      ...(await safetyOf(formData)),
       created_by: member?.id ?? null,
     })
     .select("id,assignee_id")
@@ -82,6 +97,7 @@ export async function updateTask(formData: FormData) {
       prioridad: str(formData, "prioridad"),
       fecha_limite: str(formData, "fecha_limite"),
       horas: horasOf(formData),
+      ...(await safetyOf(formData)),
     })
     .eq("id", id);
   if (error) await failBack(error.message);
@@ -204,4 +220,18 @@ export async function decideVolunteer(formData: FormData) {
   });
   if (error) await failBack(error.message);
   revalidatePath(`/tareas/${formData.get("id")}`);
+}
+
+export async function safetyDecide(formData: FormData) {
+  const { supabase } = await requireWriter();
+  const id = Number(formData.get("id"));
+  const { error } = await supabase.rpc("safety_decide", {
+    p_task: id,
+    p_estado: str(formData, "decision") ?? "Pendiente",
+    p_obs: str(formData, "obs") ?? "",
+    p_riesgo: str(formData, "riesgo") ?? "",
+  });
+  if (error) await failBack(error.message);
+  revalidatePath(`/tareas/${id}`);
+  revalidatePath("/seguridad");
 }

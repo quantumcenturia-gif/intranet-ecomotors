@@ -1,4 +1,5 @@
 import { Label, inputCls } from "@/components/ui";
+import SafetyFields from "@/components/tasks/SafetyFields";
 import { PRIORIDADES, TASK_TIPOS } from "@/data/eco-motors";
 import type { Member } from "@/lib/me";
 import type { Task } from "@/lib/tasks";
@@ -126,6 +127,7 @@ export default function TaskFields({
           {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
       </Label>
+      <SafetyFields task={task} />
     </div>
   );
 }
