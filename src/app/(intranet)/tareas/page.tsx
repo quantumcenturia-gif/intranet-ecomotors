@@ -5,7 +5,7 @@ import TaskList from "@/components/tasks/TaskList";
 import { Badge, btnPrimary, selectSm } from "@/components/ui";
 import { TASK_ESTADOS, estadoVisible } from "@/data/eco-motors";
 import { requireMe } from "@/lib/me";
-import { TASK_SELECT, type TaskRow } from "@/lib/tasks";
+import { TASK_SELECT, mineFilter, participantTaskIds, type TaskRow } from "@/lib/tasks";
 import { flattenTree, subtree, unitPath } from "@/lib/units";
 
 const OPEN = (t: TaskRow) => !["Completada y validada", "Cancelada"].includes(t.estado);
@@ -19,7 +19,7 @@ export default async function TareasPage({ searchParams }: PageProps<"/tareas">)
   const { supabase, member, units, manageable, isManager } = await requireMe();
 
   let q = supabase.from("tasks").select(TASK_SELECT).order("fecha_limite", { ascending: true, nullsFirst: false }).limit(500);
-  if (vista === "mias") q = q.eq("assignee_id", member?.id ?? "00000000-0000-0000-0000-000000000000");
+  if (vista === "mias") q = q.or(mineFilter(member?.id ?? "00000000-0000-0000-0000-000000000000", await participantTaskIds(supabase, member?.id)));
   if (vista === "convocatorias") q = q.eq("convocatoria", true);
   if (unidad && vista !== "areas") q = q.in("unit_id", subtree(units, unidad));
   if (estado && estado !== "Atrasada") q = q.eq("estado", estado);

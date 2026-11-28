@@ -71,14 +71,17 @@ export async function buildReport(p: ReportParams) {
   const ids = members.map((m) => m.id);
   const none = ["00000000-0000-0000-0000-000000000000"];
 
-  // 2) Asistencias, horas y tareas del periodo
+  // 2) Asistencias, horas y tareas del periodo (las tareas incluyen aquellas en las que colaboran)
+  const { data: parts } = await supabase.from("task_participants").select("task_id,member_id").in("member_id", ids.length ? ids : none);
+  const collab = (parts ?? []) as { task_id: number; member_id: string }[];
+  const collabIds = [...new Set(collab.map((c) => c.task_id))];
   const [{ data: sessions }, { data: hours }, { data: tasks }] = await Promise.all([
     supabase.from("attendance_sessions").select("id,unit_id,tipo,titulo,fecha,estado").gte("fecha", p.desde).lte("fecha", p.hasta).order("fecha"),
     supabase.from("time_entries").select("member_id,fecha,horas,actividad").in("member_id", ids.length ? ids : none).gte("fecha", p.desde).lte("fecha", p.hasta).order("fecha"),
     supabase
       .from("tasks")
       .select("id,title,unit_id,assignee_id,estado,prioridad,avance,fecha_asignacion,fecha_limite,updated_at,resultado_revision,entrega_url,project:projects(name)")
-      .in("assignee_id", ids.length ? ids : none)
+      .or(`assignee_id.in.(${(ids.length ? ids : none).join(",")})${collabIds.length ? `,id.in.(${collabIds.join(",")})` : ""}`)
       .lte("fecha_asignacion", p.hasta)
       .order("fecha_asignacion"),
   ]);
@@ -103,7 +106,7 @@ export async function buildReport(p: ReportParams) {
     const conv = relevantSessions.filter((s) => convoca(s, m));
     const mine = recs.filter((r) => r.member_id === m.id && conv.some((s) => s.id === r.session_id));
     const verifiedIds = new Set(conv.filter((s) => s.estado === "Verificada").map((s) => s.id));
-    const mt = tks.filter((t) => t.assignee_id === m.id);
+    const mt = tks.filter((t) => t.assignee_id === m.id || collab.some((c) => c.task_id === t.id && c.member_id === m.id));
     const open = mt.filter((t) => !["Completada y validada", "Cancelada"].includes(t.estado));
     return {
       member: m,
