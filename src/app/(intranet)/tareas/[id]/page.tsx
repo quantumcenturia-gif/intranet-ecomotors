@@ -205,6 +205,11 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                   )}
                 </div>
               )}
+              {["Completada y validada", "Cancelada"].includes(task.estado) ? (
+                <p className="rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
+                  {task.estado === "Cancelada" ? "Esta tarea fue cancelada." : "✅ Esta tarea ya fue validada."} Si hay que reabrirla, el responsable del área cambia su estado en «Revisión».
+                </p>
+              ) : (
               <form key={`p-${task.updated_at}`} action={updateProgress} className="grid gap-4 sm:grid-cols-2">
                 <input type="hidden" name="id" value={task.id} />
                 <Label label={`Avance (%)`}>
@@ -231,6 +236,7 @@ export default async function TareaPage({ params }: PageProps<"/tareas/[id]">) {
                   <button className={btnPrimary}>Guardar avance</button>
                 </div>
               </form>
+              )}
             </section>
           )}
 
